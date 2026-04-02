@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>변영광 — P&L-driven Strategy Lead &amp; PO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap" rel="stylesheet" />
+<style>
+/* ─── Variables ─── */
+:root {
+  --bg: #0a0a0a;
+  --surface: #141414;
+  --surface2: #1a1a1a;
+  --border: #1f1f1f;
+  --text: #f0f0f0;
+  --muted: #777;
+  --accent: #7c6aff;
+  --accent2: #a78bfa;
+  --radius: 12px;
+  --t: 200ms ease;
+}
+[data-theme="light"] {
+  --bg: #fafafa;
+  --surface: #ffffff;
+  --surface2: #f3f3f3;
+  --border: #e5e5e5;
+  --text: #111111;
+  --muted: #666;
+}
+
+/* ─── Reset ─── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Noto Sans KR',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.65;
+  transition:background .3s,color .3s;
+  overflow-x:hidden;
+}
+a{color:var(--accent);text-decoration:none;transition:color var(--t)}
+a:hover{color:var(--accent2)}
+img,svg{display:block}
+
+/* ─── Scroll Progress Bar ─── */
+#progress{
+  position:fixed;top:0;left:0;
+  height:2px;width:0%;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  z-index:2000;
+  transition:width .08s linear;
+}
+
+/* ─── Navbar ─── */
+#nav{
+  position:fixed;top:0;left:0;right:0;
+  height:58px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 36px;
+  background:rgba(10,10,10,.82);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  z-index:1000;
+  transition:background .3s,border-color .3s;
+}
+[data-theme="light"] #nav{background:rgba(250,250,250,.88)}
+.nav-logo{
+  font-size:17px;font-weight:800;
+  color:var(--text);letter-spacing:-.01em;
+}
+.nav-logo em{color:var(--accent);font-style:normal}
+#theme-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:6px 16px;
+  font-size:12px;font-weight:500;
+  color:var(--muted);
+  cursor:pointer;
+  font-family:inherit;
+  transition:all var(--t);
+}
+#theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ─── Section commons ─── */
+section{padding:100px 0}
+.wrap{max-width:1120px;margin:0 auto;padding:0 28px}
+.s-tag{
+  font-size:11px;font-weight:700;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--accent);
+  margin-bottom:10px;
+}
+.s-title{
+  font-size:clamp(28px,4vw,42px);font-weight:800;
+  line-height:1.15;margin-bottom:52px;
+}
+
+/* ─── Fade-in ─── */
+.fi{opacity:0;transform:translateY(28px);transition:opacity .65s ease,transform .65s ease}
+.fi.on{opacity:1;transform:none}
+
+/* ─────────────────────────────
+   HERO
+───────────────────────────── */
+#hero{
+  min-height:100vh;display:flex;align-items:center;
+  padding:0;position:relative;overflow:hidden;
+}
+.hero-glow{
+  position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 65% 55% at 50% 42%,rgba(124,106,255,.13) 0%,transparent 70%);
+}
+.hero-grid-bg{
+  position:absolute;inset:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(124,106,255,.055) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(124,106,255,.055) 1px,transparent 1px);
+  background-size:52px 52px;
+}
+[data-theme="light"] .hero-grid-bg{
+  background-image:
+    linear-gradient(rgba(124,106,255,.09) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(124,106,255,.09) 1px,transparent 1px);
+}
+.hero-inner{
+  position:relative;z-index:1;
+  max-width:1120px;margin:0 auto;
+  padding:0 28px;padding-top:90px;
+}
+.hero-pill{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(124,106,255,.11);
+  border:1px solid rgba(124,106,255,.28);
+  border-radius:999px;padding:5px 16px;
+  font-size:12px;font-weight:500;color:var(--accent2);
+  margin-bottom:28px;
+}
+.hero-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--accent);
+  animation:blink 2.2s infinite;
+}
+@keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.35)}}
+.hero-name{
+  font-size:clamp(52px,9vw,96px);font-weight:900;
+  line-height:.95;margin-bottom:10px;
+  background:linear-gradient(140deg,var(--text) 0%,var(--accent2) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero-en{
+  display:block;font-size:.48em;
+  color:var(--accent2);-webkit-text-fill-color:var(--accent2);
+  letter-spacing:.04em;font-weight:700;
+  margin-top:6px;
+}
+.hero-sub{
+  font-size:clamp(15px,2.2vw,20px);font-weight:400;
+  color:var(--muted);margin-bottom:22px;letter-spacing:.02em;
+}
+.hero-quote{
+  font-size:clamp(14px,1.8vw,17px);font-weight:500;
+  color:var(--text);
+  margin-bottom:52px;
+  padding:14px 20px;
+  border-left:3px solid var(--accent);
+  background:rgba(124,106,255,.07);
+  border-radius:0 10px 10px 0;
+  max-width:640px;
+  line-height:1.7;
+}
+.hero-cards{
+  display:flex;gap:14px;flex-wrap:wrap;
+  margin-bottom:52px;
+}
+.h-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:22px 30px;min-width:168px;
+  transition:transform var(--t),box-shadow var(--t),border-color var(--t);
+}
+.h-card:hover{
+  transform:translateY(-5px);
+  box-shadow:0 18px 44px rgba(124,106,255,.16);
+  border-color:rgba(124,106,255,.38);
+}
+.h-num{
+  font-size:34px;font-weight:800;
+  color:var(--accent);line-height:1;
+  margin-bottom:5px;
+  font-variant-numeric:tabular-nums;
+}
+.h-label{font-size:12px;color:var(--muted);font-weight:500;line-height:1.4}
+.hero-cta{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--accent);color:#fff;
+  padding:15px 30px;border-radius:999px;
+  font-weight:700;font-size:14px;
+  border:none;cursor:pointer;font-family:inherit;
+  transition:all var(--t);letter-spacing:.02em;
+}
+.hero-cta::after{content:'↓';font-size:13px}
+.hero-cta:hover{
+  background:var(--accent2);color:#fff;
+  transform:translateY(-2px);
+  box-shadow:0 10px 28px rgba(124,106,255,.42);
+}
+
+/* ─────────────────────────────
+   ABOUT — Core Competencies
+───────────────────────────── */
+#about{background:var(--bg)}
+.comp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(248px,1fr));gap:20px}
+.comp-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:30px 26px;
+  transition:transform var(--t),box-shadow var(--t),border-color var(--t);
+}
+.comp-card:hover{
+  transform:translateY(-5px);
+  box-shadow:0 18px 44px rgba(0,0,0,.22);
+  border-color:rgba(124,106,255,.32);
+}
+.comp-icon{
+  width:46px;height:46px;border-radius:11px;
+  background:rgba(124,106,255,.12);
+  display:flex;align-items:center;justify-content:center;
+  font-size:21px;margin-bottom:18px;
+}
+.comp-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px}
+.comp-en{font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--accent);margin-bottom:12px;text-transform:uppercase}
+.comp-body{font-size:13px;color:var(--muted);line-height:1.75}
+
+/* ─────────────────────────────
+   CAREER TIMELINE
+───────────────────────────── */
+#career{background:var(--surface)}
+[data-theme="light"] #career{background:#f5f5f5}
+.tl{position:relative;padding-left:36px}
+.tl::before{
+  content:'';position:absolute;
+  left:0;top:10px;bottom:0;
+  width:2px;
+  background:linear-gradient(to bottom,var(--accent) 0%,transparent 100%);
+}
+.tl-item{position:relative;margin-bottom:52px}
+.tl-item::before{
+  content:'';position:absolute;
+  left:-42px;top:7px;
+  width:12px;height:12px;
+  border-radius:50%;
+  background:var(--accent);
+  box-shadow:0 0 0 4px rgba(124,106,255,.18);
+}
+.tl-date{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--accent);margin-bottom:7px;text-transform:uppercase}
+.tl-co{font-size:21px;font-weight:800;color:var(--text);margin-bottom:2px}
+.tl-role{font-size:13px;font-weight:500;color:var(--muted);margin-bottom:10px}
+.tl-miss{
+  font-size:13px;color:var(--text);
+  padding:10px 16px;
+  background:rgba(124,106,255,.07);
+  border-left:2px solid var(--accent);
+  border-radius:0 8px 8px 0;
+  margin-bottom:14px;line-height:1.65;
+}
+.badges{display:flex;flex-wrap:wrap;gap:8px}
+.bdg{
+  background:rgba(124,106,255,.1);
+  border:1px solid rgba(124,106,255,.22);
+  color:var(--accent2);
+  padding:4px 13px;border-radius:999px;
+  font-size:12px;font-weight:500;
+}
+
+/* ─────────────────────────────
+   KEY NUMBERS
+───────────────────────────── */
+#numbers{background:var(--bg)}
+.num-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.num-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:30px 20px;text-align:center;
+  position:relative;overflow:hidden;
+  transition:transform var(--t),box-shadow var(--t),border-color var(--t);
+}
+.num-card::after{
+  content:'';position:absolute;
+  top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  opacity:0;transition:opacity var(--t);
+}
+.num-card:hover{
+  transform:translateY(-5px);
+  box-shadow:0 18px 44px rgba(124,106,255,.13);
+  border-color:rgba(124,106,255,.3);
+}
+.num-card:hover::after{opacity:1}
+.num-val{
+  font-size:clamp(20px,2.8vw,30px);font-weight:800;
+  color:var(--accent);line-height:1;
+  margin-bottom:9px;
+  font-variant-numeric:tabular-nums;
+}
+.num-ctx{font-size:12px;color:var(--text);font-weight:500;margin-bottom:4px}
+.num-sub{font-size:11px;color:var(--muted)}
+
+/* ─────────────────────────────
+   SKILLS
+───────────────────────────── */
+#skills{background:var(--surface)}
+[data-theme="light"] #skills{background:#f5f5f5}
+.sk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(248px,1fr));gap:20px}
+.sk-cat{
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:26px;
+  transition:transform var(--t),border-color var(--t);
+}
+[data-theme="light"] .sk-cat{background:#ffffff}
+.sk-cat:hover{transform:translateY(-4px);border-color:rgba(124,106,255,.3)}
+.sk-icon{font-size:24px;margin-bottom:11px}
+.sk-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:16px}
+.sk-pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{
+  background:rgba(124,106,255,.08);
+  border:1px solid rgba(124,106,255,.15);
+  color:var(--text);
+  padding:4px 13px;border-radius:999px;
+  font-size:12px;font-weight:400;
+  transition:all var(--t);
+}
+.pill:hover{background:rgba(124,106,255,.2);border-color:var(--accent);color:var(--accent2)}
+
+/* ─────────────────────────────
+   EDUCATION
+───────────────────────────── */
+#education{background:var(--bg)}
+.edu-cols{display:grid;grid-template-columns:1fr 1fr;gap:44px}
+.edu-block{margin-bottom:36px}
+.edu-block h3{
+  font-size:14px;font-weight:700;letter-spacing:.08em;
+  color:var(--accent);text-transform:uppercase;
+  padding-bottom:10px;border-bottom:1px solid var(--border);
+  margin-bottom:20px;
+}
+.edu-row{margin-bottom:22px}
+.edu-school{font-size:16px;font-weight:700;color:var(--text);margin-bottom:3px}
+.edu-deg{font-size:13px;color:var(--muted);margin-bottom:3px}
+.edu-yr{font-size:12px;color:var(--accent);font-weight:500}
+.c-item{
+  display:flex;align-items:flex-start;gap:12px;
+  margin-bottom:12px;
+  padding:14px 16px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:10px;
+  transition:border-color var(--t);
+}
+[data-theme="light"] .c-item{background:var(--surface2)}
+.c-item:hover{border-color:rgba(124,106,255,.3)}
+.c-ico{
+  width:32px;height:32px;flex-shrink:0;
+  border-radius:8px;
+  background:rgba(124,106,255,.12);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;
+}
+.c-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px}
+.c-meta{font-size:11px;color:var(--muted)}
+.aw-item{
+  font-size:13px;color:var(--muted);
+  padding:10px 14px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:8px;margin-bottom:8px;
+}
+.aw-item strong{display:block;color:var(--text);font-weight:600;margin-bottom:2px}
+
+/* ─────────────────────────────
+   CONTACT / FOOTER
+───────────────────────────── */
+#contact{background:var(--surface);text-align:center}
+[data-theme="light"] #contact{background:#f5f5f5}
+.ct-title{font-size:clamp(30px,5vw,54px);font-weight:800;margin-bottom:14px;line-height:1.1}
+.ct-sub{font-size:16px;color:var(--muted);margin-bottom:44px}
+.ct-btns{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin-bottom:64px}
+.btn-p{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--accent);color:#fff;
+  padding:15px 30px;border-radius:999px;
+  font-weight:700;font-size:14px;
+  transition:all var(--t);letter-spacing:.02em;
+}
+.btn-p:hover{background:var(--accent2);color:#fff;transform:translateY(-2px);box-shadow:0 10px 28px rgba(124,106,255,.4)}
+.btn-o{
+  display:inline-flex;align-items:center;gap:8px;
+  background:transparent;color:var(--text);
+  padding:15px 30px;border-radius:999px;
+  font-weight:600;font-size:14px;
+  border:1px solid var(--border);
+  transition:all var(--t);
+}
+.btn-o:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-2px)}
+.ct-note{
+  font-size:12px;color:var(--muted);opacity:.7;
+  max-width:600px;margin:0 auto;line-height:1.7;
+}
+footer{
+  border-top:1px solid var(--border);
+  padding:24px 28px;
+}
+.ft-inner{
+  max-width:1120px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:12px;color:var(--muted);
+  flex-wrap:wrap;gap:8px;
+}
+
+/* ─── Mobile ─── */
+@media(max-width:768px){
+  section{padding:72px 0}
+  .wrap{padding:0 20px}
+  #nav{padding:0 20px}
+  .num-grid{grid-template-columns:repeat(2,1fr)}
+  .edu-cols{grid-template-columns:1fr}
+  .hero-cards{gap:10px}
+  .h-card{min-width:140px;padding:18px 20px}
+  .h-num{font-size:26px}
+  .tl{padding-left:26px}
+  .tl-item::before{left:-32px}
+}
+@media(max-width:480px){
+  .num-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .num-card{padding:22px 14px}
+  .comp-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ── Progress ── -->
+<div id="progress"></div>
+
+<!-- ── Navbar ── -->
+<nav id="nav">
+  <div class="nav-logo">변영광<em>.</em></div>
+  <button id="theme-btn">☀&nbsp;Light</button>
+</nav>
+
+<!-- ══════════════════════════════
+     HERO
+══════════════════════════════ -->
+<section id="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-grid-bg"></div>
+  <div class="hero-inner">
+
+    <div class="hero-pill">
+      <span class="hero-dot"></span>
+      P&amp;L-driven Strategy Lead &amp; PO
+    </div>
+
+    <h1 class="hero-name">
+      변영광
+      <span class="hero-en">Glory</span>
+    </h1>
+
+    <p class="hero-sub">P&amp;L-driven Strategy Lead &amp; PO</p>
+
+    <p class="hero-quote">
+      "0→1부터 회수까지, 3회 Exit 경험(End-to-End 2건 · 소싱 1건)의 실전형 전략가"
+    </p>
+
+    <div class="hero-cards">
+      <div class="h-card">
+        <div class="h-num" id="c-exit">0회</div>
+        <div class="h-label">Exit 성공</div>
+      </div>
+      <div class="h-card">
+        <div class="h-num" id="c-rev">0억</div>
+        <div class="h-label">2025년 팀 매출</div>
+      </div>
+      <div class="h-card">
+        <div class="h-num" id="c-sub">0만</div>
+        <div class="h-label">유튜브 구독자 @극락직업</div>
+      </div>
+    </div>
+
+    <button class="hero-cta" onclick="document.getElementById('career').scrollIntoView({behavior:'smooth'})">
+      경력 보기
+    </button>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════
+     ABOUT — Core Competencies
+══════════════════════════════ -->
+<section id="about">
+  <div class="wrap">
+    <p class="s-tag fi">Core Competencies</p>
+    <h2 class="s-title fi">4가지 핵심 역량</h2>
+    <div class="comp-grid">
+
+      <div class="comp-card fi">
+        <div class="comp-icon">🤝</div>
+        <div class="comp-title">Deal Sourcing &amp; Networking</div>
+        <div class="comp-en">딜 소싱 & 네트워킹</div>
+        <p class="comp-body">필요한 순간에 정확한 사람을 연결하여 비즈니스 기회를 성과로 전환. 매각·투자·제휴 목적에 부합하는 이해관계자를 소싱하고 협상을 주도하는 '해결사형 인프라'를 보유.</p>
+      </div>
+
+      <div class="comp-card fi" style="transition-delay:.1s">
+        <div class="comp-icon">🔀</div>
+        <div class="comp-title">Cross-functional Leadership</div>
+        <div class="comp-en">직무 융합 & 실무형 리더십</div>
+        <p class="comp-body">실무의 맥락을 꿰뚫고 실행 속도를 높여 결과의 디테일을 검증하는 리더. T자형을 넘어 넓은 범위를 깊이 이해하고 연결하는 π자형 제너럴리스트.</p>
+      </div>
+
+      <div class="comp-card fi" style="transition-delay:.2s">
+        <div class="comp-icon">👥</div>
+        <div class="comp-title">Talent Acceleration &amp; Coaching</div>
+        <div class="comp-en">성과 중심 인재 육성</div>
+        <p class="comp-body">저성과자를 핵심 인재로 전환시키는 성과 중심 팀 빌딩 노하우. 제한된 인적 자원 환경에서도 R&amp;R 최적화와 성취 경험 설계로 팀 전체 퍼포먼스를 상향 평준화.</p>
+      </div>
+
+      <div class="comp-card fi" style="transition-delay:.3s">
+        <div class="comp-icon">🚀</div>
+        <div class="comp-title">Founder Mindset &amp; Proven Exit</div>
+        <div class="comp-en">오너십 기반 목표 완수</div>
+        <p class="comp-body">4평 창고에서 시작한 창업부터 총 3회 Exit까지. 조직의 P&amp;L(손익)과 생존을 함께 고민하는 '독립된 파트너'로서 목표 설정부터 마무리 끝단까지 책임.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════
+     CAREER TIMELINE
+══════════════════════════════ -->
+<section id="career">
+  <div class="wrap">
+    <p class="s-tag fi">Career Timeline</p>
+    <h2 class="s-title fi">경력 사항</h2>
+
+    <div class="tl">
+
+      <!-- 1 -->
+      <div class="tl-item fi">
+        <div class="tl-date">2024.10 — 2026.01</div>
+        <div class="tl-co">시퀀스엔</div>
+        <div class="tl-role">신사업전략팀 · 팀장</div>
+        <div class="tl-miss">신규 커머스·콘텐츠 사업 0→1 셋업, 2025년 팀 매출 5.37억 달성 리딩</div>
+        <div class="badges">
+          <span class="bdg">팀 매출 5.37억</span>
+          <span class="bdg">@극락직업 18.4만 구독자</span>
+          <span class="bdg">MRR 550만원 확보</span>
+          <span class="bdg">재구매율 64% (베이핏)</span>
+          <span class="bdg">2명 → 5명 조직 스케일업</span>
+        </div>
+      </div>
+
+      <!-- 2 -->
+      <div class="tl-item fi">
+        <div class="tl-date">2023.12 — 2024.10</div>
+        <div class="tl-co">트렌드헌터</div>
+        <div class="tl-role">사업기획 PM</div>
+        <div class="tl-miss">경영진 요청 기반 사업 진단·리빌딩, D2C 브랜드 런칭·성장, 브랜드/채널 자산화로 M&amp;A(Asset Deal) 클로징</div>
+        <div class="badges">
+          <span class="bdg">M&amp;A 딜 클로징 3건</span>
+          <span class="bdg">최고 월매출 6,800만원 (베이핏, 런칭 4개월)</span>
+          <span class="bdg">영업이익 4,400만원 (탐구생활, 3개월)</span>
+          <span class="bdg">@탐구생활 구독자 54만</span>
+          <span class="bdg">YoY 33% 수익 증대</span>
+        </div>
+      </div>
+
+      <!-- 3 -->
+      <div class="tl-item fi">
+        <div class="tl-date">2022.12 — 2023.07</div>
+        <div class="tl-co">시퀀스엔</div>
+        <div class="tl-role">기획지원팀 · 팀장</div>
+        <div class="tl-miss">광고대행 신사업 0→1 셋업·운영 리딩, 중고 도서 플랫폼(북코아) 리빌딩</div>
+        <div class="badges">
+          <span class="bdg">월 매출 1.2억 (역대 최고)</span>
+          <span class="bdg">신규 가입자 3,000명/월 (전년比 3.7배)</span>
+          <span class="bdg">셀러 등록권 18만권 (전년比 2.5배)</span>
+          <span class="bdg">Google Ads ROAS 972%</span>
+          <span class="bdg">월 광고 수수료 280만원</span>
+        </div>
+      </div>
+
+      <!-- 4 -->
+      <div class="tl-item fi">
+        <div class="tl-date">2022.09 — 2022.11</div>
+        <div class="tl-co">브레이크앤컴퍼니</div>
+        <div class="tl-role">전략기획실 · 매니저</div>
+        <div class="tl-miss">개발자 중심 조직 내 유일한 마케터(1인)로 마케팅 인프라 0 to 1 구축, 온·오프라인 통합 마케팅 및 방향 설정</div>
+        <div class="badges">
+          <span class="bdg">팝업 당일 매출 800만원</span>
+          <span class="bdg">팔로워 2,000명 증가</span>
+          <span class="bdg">타겟 DB 200건 확보</span>
+          <span class="bdg">샘 해밍턴 등 메가 인플루언서 협업</span>
+        </div>
+      </div>
+
+      <!-- 5 -->
+      <div class="tl-item fi">
+        <div class="tl-date">2019.08 — 2022.07</div>
+        <div class="tl-co">네이버 스마트스토어 (의류 브랜드)</div>
+        <div class="tl-role">대표 · 1인 창업</div>
+        <div class="tl-miss">4평 창고에서 1인 창업 — 기획·마케팅·운영 전 과정 직접 리딩하며 매출 1억 달성 (YoY 180% 성장)</div>
+        <div class="badges">
+          <span class="bdg">YoY +180% 성장</span>
+          <span class="bdg">연 매출 1억원 달성</span>
+          <span class="bdg">네이버 쇼핑 주요 키워드 1위</span>
+          <span class="bdg">소싱·마케팅·물류·CS 1인 시스템 구축</span>
+        </div>
+      </div>
+
+      <!-- 6 -->
+      <div class="tl-item fi">
+        <div class="tl-date">2018.02 — 2019.03</div>
+        <div class="tl-co">교회음향백화점</div>
+        <div class="tl-role">기술·영업팀장</div>
+        <div class="tl-miss">유통 구조를 스스로 개척해 대학생 신분으로 업계 스카웃 — B2B/B2C 세일즈·SCM·SLA까지 구축한 기술·영업 리드</div>
+        <div class="badges">
+          <span class="bdg">B2B/B2C 세일즈 채널 구축</span>
+          <span class="bdg">SLA 최초 도입</span>
+          <span class="bdg">커뮤니티 Lock-in 전략</span>
+          <span class="bdg">공공기관·학교·교회 납품 수주</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════
+     KEY NUMBERS
+══════════════════════════════ -->
+<section id="numbers">
+  <div class="wrap">
+    <p class="s-tag fi">Key Numbers</p>
+    <h2 class="s-title fi">숫자로 보는 성과</h2>
+    <div class="num-grid">
+
+      <div class="num-card fi">
+        <div class="num-val">3회</div>
+        <div class="num-ctx">사업 Exit</div>
+        <div class="num-sub">End-to-End 2건 + 소싱 1건</div>
+      </div>
+
+      <div class="num-card fi" style="transition-delay:.05s">
+        <div class="num-val">5.37억</div>
+        <div class="num-ctx">팀 연간 매출</div>
+        <div class="num-sub">2025년 달성</div>
+      </div>
+
+      <div class="num-card fi" style="transition-delay:.1s">
+        <div class="num-val">18.4만</div>
+        <div class="num-ctx">유튜브 구독자</div>
+        <div class="num-sub">@극락직업</div>
+      </div>
+
+      <div class="num-card fi" style="transition-delay:.15s">
+        <div class="num-val">64%</div>
+        <div class="num-ctx">재구매율</div>
+        <div class="num-sub">베이핏 충성 고객층</div>
+      </div>
+
+      <div class="num-card fi" style="transition-delay:.2s">
+        <div class="num-val">6,800만</div>
+        <div class="num-ctx">최고 월 매출</div>
+        <div class="num-sub">베이핏 · 런칭 4개월</div>
+      </div>
+
+      <div class="num-card fi" style="transition-delay:.25s">
+        <div class="num-val">4,400만</div>
+        <div class="num-ctx">영업이익</div>
+        <div class="num-sub">탐구생활 · 3개월</div>
+      </div>
+
+      <div class="num-card fi" style="transition-delay:.3s">
+        <div class="num-val">1.2억</div>
+        <div class="num-ctx">역대 최고 월 매출</div>
+        <div class="num-sub">북코아 리빌딩 후</div>
+      </div>
+
+      <div class="num-card fi" style="transition-delay:.35s">
+        <div class="num-val">+180%</div>
+        <div class="num-ctx">YoY 매출 성장</div>
+        <div class="num-sub">스마트스토어</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════
+     SKILLS & TOOLS
+══════════════════════════════ -->
+<section id="skills">
+  <div class="wrap">
+    <p class="s-tag fi">Skills &amp; Tools</p>
+    <h2 class="s-title fi">직무 스킬 및 툴</h2>
+    <div class="sk-grid">
+
+      <div class="sk-cat fi">
+        <div class="sk-icon">🤖</div>
+        <div class="sk-name">AI / 자동화</div>
+        <div class="sk-pills">
+          <span class="pill">ChatGPT</span>
+          <span class="pill">Claude</span>
+          <span class="pill">Gemini</span>
+          <span class="pill">Perplexity</span>
+          <span class="pill">Midjourney</span>
+          <span class="pill">Graphy</span>
+          <span class="pill">Gamma</span>
+        </div>
+      </div>
+
+      <div class="sk-cat fi" style="transition-delay:.1s">
+        <div class="sk-icon">📋</div>
+        <div class="sk-name">PM &amp; 협업</div>
+        <div class="sk-pills">
+          <span class="pill">Notion</span>
+          <span class="pill">Google Workspace</span>
+          <span class="pill">Teams</span>
+          <span class="pill">Flow</span>
+          <span class="pill">Slack</span>
+          <span class="pill">Asana</span>
+        </div>
+      </div>
+
+      <div class="sk-cat fi" style="transition-delay:.2s">
+        <div class="sk-icon">📊</div>
+        <div class="sk-name">데이터 분석</div>
+        <div class="sk-pills">
+          <span class="pill">GA4</span>
+          <span class="pill">GTM</span>
+          <span class="pill">Meta Pixel</span>
+          <span class="pill">Airbridge</span>
+          <span class="pill">Google Sheets</span>
+          <span class="pill">Excel</span>
+          <span class="pill">Naver Analytics</span>
+          <span class="pill">Adriel</span>
+          <span class="pill">Cigro</span>
+          <span class="pill">Smartlog</span>
+          <span class="pill">Holistics</span>
+        </div>
+      </div>
+
+      <div class="sk-cat fi" style="transition-delay:.3s">
+        <div class="sk-icon">🎨</div>
+        <div class="sk-name">디자인 &amp; 프로토타이핑</div>
+        <div class="sk-pills">
+          <span class="pill">Figma</span>
+          <span class="pill">Adobe</span>
+          <span class="pill">CapCut</span>
+          <span class="pill">PowerPoint</span>
+          <span class="pill">미리캔버스</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════
+     EDUCATION & CERTIFICATIONS
+══════════════════════════════ -->
+<section id="education">
+  <div class="wrap">
+    <p class="s-tag fi">Education &amp; Certifications</p>
+    <h2 class="s-title fi">학력 및 자격</h2>
+
+    <div class="edu-cols">
+
+      <!-- Left: 학력 + 수상 -->
+      <div>
+        <div class="edu-block fi">
+          <h3>학력</h3>
+          <div class="edu-row">
+            <div class="edu-school">대구교육대학교 (석사)</div>
+            <div class="edu-deg">교육심리 및 학습컨설팅 전공 · 학점 4.4/4.5 · 수료</div>
+            <div class="edu-yr">2019.03 — 2022.08</div>
+          </div>
+          <div class="edu-row">
+            <div class="edu-school">대구예술대학교 (학사)</div>
+            <div class="edu-deg">실용음악과 (드럼) 전공 · 학점 4.2/4.5 · 수석 졸업</div>
+            <div class="edu-yr">2015.03 — 2019.02</div>
+          </div>
+        </div>
+
+        <div class="edu-block fi" style="transition-delay:.1s">
+          <h3>수상 및 활동</h3>
+          <div class="aw-item">
+            <strong>대구광역시 인재육성 장학금</strong>
+            대구광역시청
+          </div>
+          <div class="aw-item">
+            <strong>대구실용음악콩쿠르 대학부 동상</strong>
+            대구국제재즈 조직위원회
+          </div>
+          <div class="aw-item">
+            <strong>포스코(POSCO) 취업아카데미</strong>
+            Design Thinking 기반 기업 실무 과제 수행 · 2022.05–06
+          </div>
+          <div class="aw-item">
+            <strong>공연 및 이벤트 기획·운영 총 100회 이상</strong>
+            무대 연출·실연, 행사 기획 및 현장 운영 · 2012–2021
+          </div>
+          <div class="aw-item">
+            <strong>대구 북구청 진로·취업 멘토링 강연</strong>
+            관내 청소년 대상 진로 설계 및 멘토링 강의 · 2019.11
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: 자격증 + 기타 -->
+      <div class="fi" style="transition-delay:.15s">
+        <div class="edu-block">
+          <h3>자격증</h3>
+          <div class="c-item">
+            <div class="c-ico">📈</div>
+            <div>
+              <div class="c-name">Google Analytics (GAIQ)</div>
+              <div class="c-meta">Google · 2022.08 취득</div>
+            </div>
+          </div>
+          <div class="c-item">
+            <div class="c-ico">🎯</div>
+            <div>
+              <div class="c-name">Google Ads — Search / Display</div>
+              <div class="c-meta">Google · 2023.01 취득</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="edu-block" style="margin-top:32px">
+          <h3>강의 및 코칭</h3>
+          <div class="c-item">
+            <div class="c-ico">📚</div>
+            <div>
+              <div class="c-name">교육·강의 활동</div>
+              <div class="c-meta">청소년·성인·발달장애 학생 맞춤 커리큘럼 설계 및 코칭 · 2012–2022</div>
+            </div>
+          </div>
+          <div class="c-item">
+            <div class="c-ico">🎓</div>
+            <div>
+              <div class="c-name">사내 AI 세미나 / GPTs 배포</div>
+              <div class="c-meta">팀 생산성 향상을 위한 커스텀 챗봇 설계 및 교육 운영</div>
+            </div>
+          </div>
+          <div class="c-item">
+            <div class="c-ico">🏆</div>
+            <div>
+              <div class="c-name">광고 세미나 커리큘럼 개발·운영</div>
+              <div class="c-meta">개념·플랫폼·과제·A/B 테스트·리포트 등 내부 부사수 육성</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════
+     CONTACT
+══════════════════════════════ -->
+<section id="contact">
+  <div class="wrap">
+    <p class="s-tag fi" style="text-align:center">Contact</p>
+    <h2 class="ct-title fi">함께 일하고 싶다면<br>연락주세요</h2>
+    <p class="ct-sub fi">byunglory@gmail.com</p>
+    <div class="ct-btns fi">
+      <a href="mailto:byunglory@gmail.com" class="btn-p">✉&nbsp;이메일 보내기</a>
+      <a href="https://vo.la/YJ9q901" target="_blank" rel="noopener" class="btn-o">↗&nbsp;포트폴리오 보기</a>
+    </div>
+    <p class="ct-note fi">기재된 모든 성과 및 수치는 실 데이터(Raw Data)에 기반하며, 요청 시 보안 규정 범위 내에서 증빙 가능합니다.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="ft-inner">
+    <span>© 2026 변영광 (Glory). All rights reserved.</span>
+    <span>P&amp;L-driven Strategy Lead &amp; PO · byunglory@gmail.com</span>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════
+     JAVASCRIPT
+══════════════════════════════ -->
+<script>
+(function(){
+  /* ── Scroll progress ── */
+  const prog = document.getElementById('progress');
+  window.addEventListener('scroll', () => {
+    const s = window.scrollY;
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    prog.style.width = (s / h * 100).toFixed(2) + '%';
+  }, {passive:true});
+
+  /* ── Theme toggle ── */
+  const html = document.documentElement;
+  const btn = document.getElementById('theme-btn');
+  btn.addEventListener('click', () => {
+    const dark = html.getAttribute('data-theme') === 'dark';
+    html.setAttribute('data-theme', dark ? 'light' : 'dark');
+    btn.innerHTML = dark ? '🌙&nbsp;Dark' : '☀&nbsp;Light';
+  });
+
+  /* ── Fade-in via IntersectionObserver ── */
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('on'); });
+  }, {threshold: 0.12});
+  document.querySelectorAll('.fi').forEach(el => io.observe(el));
+
+  /* ── Hero counter animation ── */
+  function animNum(el, end, fmt) {
+    const dur = 1600;
+    const start = performance.now();
+    function tick(now) {
+      const p = Math.min((now - start) / dur, 1);
+      const eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
+      el.textContent = fmt(eased * end);
+      if (p < 1) requestAnimationFrame(tick);
+      else el.textContent = fmt(end);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  const heroIO = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      // Exit
+      animNum(document.getElementById('c-exit'), 3, v => Math.round(v) + '회');
+      // Revenue
+      animNum(document.getElementById('c-rev'), 5.37, v => v.toFixed(2) + '억');
+      // Subscribers
+      animNum(document.getElementById('c-sub'), 18.4, v => v.toFixed(1) + '만');
+      heroIO.disconnect();
+    });
+  }, {threshold: 0.5});
+  const heroEl = document.getElementById('hero');
+  if(heroEl) heroIO.observe(heroEl);
+
+})();
+</script>
+
+</body>
+</html>
