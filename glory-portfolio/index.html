@@ -1,0 +1,2718 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>변영광 | Strategy Lead & PO</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <!-- Three.js & GSAP 추가 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <style>
+    /* ========================================= */
+    /* [공통 설정] */
+    /* ========================================= */
+    :root {
+      --bg: #0a0a0a;
+      --surface: rgba(255, 255, 255, 0.03);
+      --border: rgba(255, 255, 255, 0.08);
+      --text-primary: #f5f5f7;
+      --text-secondary: rgba(245, 245, 247, 0.45);
+      --text-tertiary: #d1d1d6;
+      --accent: #b4b4ff;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-primary);
+      /* 영문은 Inter, 한글은 Pretendard, 그 외 환경은 시스템 폰트로 매끄럽게 연결 */
+      font-family: 'Inter', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+      overflow-x: hidden;
+      margin: 0;
+      word-break: keep-all; /* 한글 텍스트 줄바꿈 최적화 추가 */
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .ambient-glow {
+      position: fixed;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80vw;
+      height: 80vh;
+      background: radial-gradient(circle, rgba(120, 120, 180, 0.05) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .fade-up-item {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .fade-up-item.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ========================================= */
+    /* [섹션 1: 인트로] */
+    /* ========================================= */
+    .word {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .word.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .glory-word {
+      background: linear-gradient(135deg, #ffffff 20%, rgba(180, 180, 255, 0.8) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    @keyframes simpleGlow {
+
+      0%,
+      100% {
+        box-shadow: 0 0 15px 1px rgba(180, 180, 255, 0.15);
+      }
+
+      50% {
+        box-shadow: 0 0 18px 2px rgba(180, 180, 255, 0.4);
+      }
+    }
+
+    .cta-btn {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: #f5f5f7;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      animation: simpleGlow 4s ease-in-out infinite;
+    }
+
+    .cta-btn:hover {
+      background: #d9d7d7;
+      color: #0a0a0a;
+      border-color: #fff;
+      transform: scale(1.04) translateY(-1px);
+      animation: none;
+      box-shadow: 0 10px 30px rgba(255, 255, 255, 0.25), 0 0 0 1px rgba(255, 255, 255, 1);
+    }
+
+    @keyframes bounceArrow {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(4px);
+      }
+    }
+
+    .cta-arrow {
+      animation: bounceArrow 1.5s ease-in-out infinite;
+    }
+
+    /* ========================================= */
+    /* [섹션 2: 성과 요약 (3D 카드)] */
+    /* ========================================= */
+    /* 카피 이펙트 (빛 번짐) */
+    .results-title {
+      font-size: clamp(1.2rem, 2vw, 1.5rem);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: linear-gradient(120deg, rgba(180, 180, 255, 0.3) 0%, rgba(180, 180, 255, 1) 50%, rgba(180, 180, 255, 0.3) 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* 화면에 노출(is-visible)되는 순간부터 0% 애니메이션 시작 */
+    .is-visible .results-title {
+      animation: shineText 4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+    }
+
+    @keyframes shineText {
+      0% {
+        background-position: -100% center;
+      }
+
+      50% {
+        background-position: 200% center;
+      }
+
+      100% {
+        background-position: 200% center;
+      }
+    }
+
+    .flip-container {
+      perspective: 1000px;
+      width: 100%;
+      height: 320px;
+      cursor: pointer;
+    }
+
+    .flip-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
+      transform-style: preserve-3d;
+    }
+
+    .flip-container:hover .flip-inner {
+      transform: rotateY(180deg);
+    }
+
+    .flip-front,
+    .flip-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.5rem; /* 모바일 카드 내부 여백 축소 */
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+    @media (min-width: 768px) {
+      .flip-front, .flip-back { padding: 2.5rem; }
+    }
+
+    .flip-front {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      align-items: flex-start;
+    }
+
+    /* 카드 뒷면 하이엔드 메탈 디자인 */
+    .flip-back {
+      transform: rotateY(180deg);
+      background: #0d0d0d;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      align-items: flex-start;
+      box-shadow: inset 0 0 30px rgba(180, 180, 255, 0.03), 0 20px 40px rgba(0, 0, 0, 0.8);
+    }
+
+    .flip-back::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.05), transparent);
+      transform: skewX(-20deg);
+      transition: all 0.7s ease;
+      pointer-events: none;
+    }
+
+    .flip-container:hover .flip-back::before {
+      left: 200%;
+      transition-delay: 0.3s;
+    }
+
+    .flip-back .back-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.5rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .playbook-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 28px;
+      border-radius: 100px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      z-index: 2;
+    }
+
+    .playbook-btn:hover {
+      background: #fff;
+      color: #000;
+      transform: translateY(-2px) scale(1.02);
+      border-color: #fff;
+    }
+
+    /* 폰트 통일 */
+    .pachinko-target {
+      font-family: 'Pretendard', sans-serif;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .slot-wrapper {
+      display: inline-block;
+      overflow: hidden;
+      height: 1em;
+      line-height: 1;
+      vertical-align: top;
+      position: relative;
+    }
+
+    /* 숫자와 소수점에만 당김 효과 적용 */
+    .slot-wrapper.tight-spacing {
+      margin-right: -0.001em;
+    }
+
+    .slot-column {
+      display: inline-flex;
+      flex-direction: column;
+      transition: transform 2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .slot-char {
+      height: 1em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 카드 앞면 정적 배경 (색상 포인트 추가) */
+    .card-static-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.7;
+      overflow: hidden;
+      border-radius: 24px;
+    }
+
+    .card-static-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(180, 180, 255, 0.1) 0%, transparent 70%);
+    }
+
+    .flip-front>div {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ========================================= */
+    /*[섹션 3: 역량 (Capabilities) - 3D Brain & Interaction] */
+    /* ========================================= */
+    .capabilities-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 4rem;
+      min-height: 80vh;
+    }
+
+    @media (min-width: 1024px) {
+      .capabilities-wrapper {
+        flex-direction: row;
+        gap: 4rem;
+        align-items: center;
+      }
+    }
+
+    .cap-left {
+      flex: 1;
+      width: 100%;
+      max-width: 100%;
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    @media (min-width: 1024px) {
+      .cap-left { flex: 0 0 400px; }
+    }
+
+    .cap-eyebrow {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .cap-headline {
+      font-size: clamp(2.5rem, 4vw, 4rem);
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 2rem;
+    }
+
+    /* 좌측 키워드 리스트 스타일 */
+    .cap-keyword-btn {
+      text-align: left;
+      padding: 1.2rem 1.5rem;
+      font-size: clamp(1.2rem, 2vw, 1.5rem);
+      font-weight: 600;
+      color: var(--text-tertiary);
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: color 0.4s ease;
+      letter-spacing: -0.02em;
+    }
+
+    /* GSAP 애니메이션 충돌을 막기 위해 버튼 내부 타이틀을 타겟팅하여 확대 */
+    .cap-keyword-btn .modal-list-title {
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      transform-origin: left center;
+    }
+
+    .cap-keyword-btn:hover,
+    .cap-keyword-btn.active {
+      color: #fff;
+    }
+
+    .cap-keyword-btn:hover .modal-list-title,
+    .cap-keyword-btn.active .modal-list-title {
+      transform: scale(1.08);
+      /* 1.08배 부드럽게 확대 */
+    }
+
+    .cap-right {
+      flex: 1;
+      width: 100%;
+      position: relative;
+      height: 400px; /* 모바일 높이 축소 */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    @media (min-width: 1024px) {
+      .cap-right { height: 600px; }
+    }
+
+    #brain-canvas-container {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .cap-detail-panel {
+      position: absolute;
+      right: 0;
+      width: 100%;
+      max-width: 680px;
+      background: rgba(15, 15, 15, 0.65);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 2.5rem 1.5rem; /* 모바일 패딩 축소 */
+      /* ...나머지 속성(opacity, transform 등)은 기존 동일 유지... */
+      opacity: 0;
+      transform: translateX(40px);
+      transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 10;
+      pointer-events: none;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+    @media (min-width: 768px) {
+      .cap-detail-panel { padding: 4.5rem 4rem; }
+    }
+
+    .cap-detail-panel.active {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+
+    .cap-detail-num {
+      font-family: 'Inter', monospace;
+      font-size: 1rem;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .cap-detail-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 1.5rem;
+      line-height: 1.3;
+      letter-spacing: -0.02em;
+    }
+
+    .cap-detail-desc {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 2rem;
+      word-break: keep-all;
+    }
+
+    .cap-detail-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .cap-detail-tag {
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+
+    /* 순차적 노출 애니메이션 클래스 */
+    .seq-fade {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    /* ========================================= */
+    /* [섹션 4: 프로젝트 (Selected Work)] */
+    /* ========================================= */
+    #projects {
+      position: relative;
+      z-index: 20;
+      background-color: #030303;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      border-top-left-radius: 40px;
+      border-top-right-radius: 40px;
+      box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    .cat-item {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .cat-header {
+      width: 100%;
+      text-align: left;
+      padding: 2.5rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      position: relative;
+    }
+
+    .cat-header:hover .cat-title {
+      color: #fff;
+      transform: translateX(10px);
+    }
+
+    .cat-title {
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-weight: 700;
+      color: var(--text-tertiary);
+      letter-spacing: -0.03em;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .cat-desc {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      transition: color 0.4s ease;
+    }
+
+    .cat-icon {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      transition: all 0.4s ease;
+    }
+
+    .cat-item.active .cat-icon {
+      transform: translateY(-50%) rotate(45deg);
+      background: #fff;
+      color: #000;
+    }
+
+    .cat-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .cat-content-inner {
+      padding: 2rem 0 4rem 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .proj-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      cursor: pointer;
+      transform-style: preserve-3d;
+      transition: border-color 0.3s ease, background 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .proj-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(180, 180, 255, 0.06), transparent 40%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .proj-card:hover {
+      border-color: rgba(180, 180, 255, 0.3);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .proj-card:hover::before {
+      opacity: 1;
+    }
+
+    .proj-num {
+      font-size: 0.8rem;
+      font-family: monospace;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      display: block;
+      transform: translateZ(20px);
+    }
+
+    .proj-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #fff;
+      line-height: 1.3;
+      transform: translateZ(30px);
+    }
+
+    /* ========================================= */
+    /* [섹션 5: About (철학과 역량)] */
+    /* ========================================= */
+    #about {
+      position: relative;
+      z-index: 10;
+      background-color: var(--bg);
+      padding-bottom: 8rem;
+    }
+
+    .about-main-text {
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.3;
+      letter-spacing: -0.03em;
+      margin-bottom: 2rem;
+      max-width: 900px;
+    }
+
+    .about-sub-text {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--text-secondary);
+      line-height: 1.6;
+      max-width: 700px;
+      margin-bottom: 3rem;
+    }
+
+    .about-word {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .about-word.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* [수정 2] 경력기술서 CTA: 프레임 드랍 없는 부드러운 스윕(Sweep) 효과 */
+    .glow-btn-wrapper {
+      position: relative;
+      display: inline-flex;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      padding: 1.5px;
+      background: transparent;
+      overflow: hidden;
+    }
+
+    .glow-btn-wrapper:hover {
+      transform: translateY(-2px) scale(1.02);
+    }
+
+    .glow-btn-wrapper::before {
+      content: '';
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      top: -50%;
+      left: -50%;
+      background: conic-gradient(transparent 0deg 200deg, rgba(180, 180, 255, 0.2) 220deg, rgba(180, 180, 255, 0.6) 270deg, rgba(255, 255, 255, 1) 300deg, rgba(180, 180, 255, 0.6) 330deg, rgba(180, 180, 255, 0.1) 350deg, transparent 360deg);
+      animation: spinBorder 2.5s linear infinite;
+      will-change: transform;
+    }
+
+    @keyframes spinBorder {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .glow-btn-wrapper::after {
+      content: '';
+      position: absolute;
+      inset: 1.5px;
+      border-radius: 100px;
+      background: #0a0a0a;
+      z-index: 1;
+    }
+
+    .glow-btn-inner {
+      position: relative;
+      z-index: 2;
+      background: transparent;
+      border-radius: 100px;
+      padding: 14px 32px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* [수정 3] Bento Grid: 초기 투명도 0 세팅 */
+    .about-bento {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      margin-top: 6rem;
+    }
+
+    @media (min-width: 768px) {
+      .about-bento {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .bento-card-adv {
+      position: relative;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 2.5rem;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      transform: perspective(800px) translateZ(-120px) scale(0.75);
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease;
+    }
+
+    .bento-card-adv.reveal-active {
+      opacity: 1;
+      transform: perspective(800px) translateZ(0) scale(1);
+    }
+
+    .bento-card-adv::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(180, 180, 255, 0.08), transparent 40%);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .bento-card-adv:hover::before {
+      opacity: 1;
+    }
+
+    .bento-card-adv:hover {
+      border-color: rgba(180, 180, 255, 0.25);
+    }
+
+    .bento-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .bento-icon {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      display: block;
+    }
+
+    .bento-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.02em;
+    }
+
+    .bento-desc {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    @media (min-width: 768px) {
+      .founder-card {
+        grid-column: span 2;
+      }
+    }
+
+    /* ========================================= */
+    /* [모달 및 사이드 드로어 UI] */
+    /* ========================================= */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* 모달 디자인 대폭 상향 (크기 확장 및 레이아웃 개선) */
+    .modal-content {
+      background: rgba(15, 15, 15, 0.95);
+      border: 1px solid rgba(180, 180, 255, 0.15);
+      border-radius: 24px;
+      width: 100%;
+      max-width: 900px;
+      max-height: 85vh;
+      overflow-y: auto;
+      transform: scale(0.95) translateY(20px);
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .modal-overlay.active .modal-content {
+      transform: scale(1) translateY(0);
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 50%;
+      padding: 8px;
+      width: 40px;
+      height: 40px;
+      z-index: 10;
+    }
+
+    .close-btn:hover {
+      color: #fff;
+      background: rgba(180, 180, 255, 0.2);
+      transform: rotate(90deg);
+    }
+
+    .modal-body {
+      padding: 2.5rem 1.5rem; /* 모바일 모달 내부 여백 축소 */
+      color: var(--text-tertiary);
+      line-height: 1.6;
+      position: relative;
+    }
+    @media (min-width: 768px) {
+      .modal-body { padding: 3.5rem 3rem; }
+    }
+
+    .modal-body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 150px;
+      background: linear-gradient(180deg, rgba(180, 180, 255, 0.05) 0%, transparent 100%);
+      pointer-events: none;
+      border-top-left-radius: 24px;
+      border-top-right-radius: 24px;
+    }
+
+    .modal-title {
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      letter-spacing: -0.03em;
+      position: relative;
+    }
+
+    /* 모달 리스트 카드형 UI */
+    .modal-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      position: relative;
+    }
+
+    .modal-list li {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 1.5rem 2rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .modal-list li:hover {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(180, 180, 255, 0.3);
+      transform: translateX(5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-list-title {
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal-list-title::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      flex-shrink: 0; /* 👈 글자가 길어도 불릿이 절대 찌그러지거나 사라지지 않도록 강제 방어 */
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+    }
+
+    .modal-list-desc {
+      font-size: 1.15rem;
+      color: rgba(245, 245, 247, 0.6);
+      line-height: 1.6;
+      padding-left: 16px;
+    }
+
+    .modal-link {
+      color: var(--accent);
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    .modal-link:hover {
+      opacity: 0.8;
+    }
+
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .drawer-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .drawer-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      max-width: 40vw; /* 카피 영역 40% */
+      min-width: 500px; /* 창이 좁아질 때 글씨가 찌그러지지 않도록 방어선 구축 */
+      background: #0a0a0a;
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 201;
+      transform: translateX(100%);
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      box-shadow: -20px 0 50px rgba(0, 0, 0, 0.5);
+    }
+
+    /* 모바일에서는 서랍장이 꽉 차도록 예외 처리 */
+    @media (max-width: 768px) {
+      .drawer-panel {
+        max-width: 100%;
+        min-width: 100%;
+      }
+    }
+
+    /* 애니메이션(@keyframes logoGlow) 전체 삭제 및 고정 발광 값 적용 */
+    .logo-glow-effect {
+      /* 하단 입체감 그림자 + 약 65% 강도의 중심부 발광 + 30% 강도의 외곽 퍼짐 고정 */
+      filter: drop-shadow(0 15px 25px rgba(0,0,0,0.8)) 
+              drop-shadow(0 0 30px rgba(180, 180, 255, 0.5)) 
+              drop-shadow(0 0 50px rgba(180, 180, 255, 0.1));
+    }
+
+    /* 서랍이 닫힐 때 로고 잔상을 부드럽게 먼저 지우는 마법의 CSS */
+    #project-drawer:not(.active) .drawer-logo-wrap {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    #project-drawer.active .drawer-logo-wrap {
+      opacity: 1;
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s; /* 열릴 때는 살짝 딜레이를 주어 여운을 남김 */
+    }
+    .drawer-panel.active {
+      transform: translateX(0);
+    }
+
+    .drawer-header {
+      padding: 2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .drawer-close {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #fff;
+    }
+
+    .drawer-close:hover {
+      background: #fff;
+      color: #000;
+    }
+
+    .drawer-body {
+      padding: 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .drawer-tag {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: rgba(180, 180, 255, 0.1);
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .drawer-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.2;
+      margin-bottom: 2rem;
+      letter-spacing: -0.02em;
+    }
+
+    .impact-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .impact-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .impact-text {
+      font-size: 1.1rem;
+      color: #fff;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    .action-group {
+      margin-bottom: 2rem;
+    }
+
+    .action-label {
+      font-size: 1rem;
+      color: #fff;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .action-label::before {
+      content: '';
+      display: block;
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    .action-text {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      padding-left: 14px;
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+      margin-left: 3px;
+    }
+
+    .keyword-list {
+      margin-top: 5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      width: 100%;
+    }
+
+    .keyword-item {
+      font-size: clamp(2rem, 5vw, 4rem);
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.12);
+      letter-spacing: -0.03em;
+      line-height: 1.3;
+      padding: 0.4rem 0;
+      cursor: default;
+      transition: color 0.4s ease;
+    }
+
+    .keyword-item.kw-active {
+      color: #fff;
+    }
+
+    .keyword-item.kw-done {
+      color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* ========================================= */
+    /* [섹션 5: About — Keyword Stage] */
+    /* ========================================= */
+    #about {
+      position: relative;
+      z-index: 10;
+      background-color: var(--bg);
+    }
+
+    .kw-stage {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .kw-center {
+      position: absolute;
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: #fff;
+      text-align: center;
+      opacity: 0;
+      transform: scale(0.6);
+      transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .kw-center.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .kw-scattered {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .kw-tag {
+      position: absolute;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.22);
+      letter-spacing: -0.02em;
+      opacity: 0;
+      transition: opacity 0.6s ease, transform 0.5s ease;
+      white-space: nowrap;
+    }
+
+    .kw-tag.placed {
+      opacity: 1;
+    }
+
+    .kw-tag.dimmed {
+      opacity: 0.06;
+      transition: opacity 0.8s ease;
+    }
+
+    .about-finale {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .about-finale.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .about-line {
+      display: block;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 1s ease, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .about-line.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .glow-btn-wrapper {
+      position: relative;
+      display: inline-flex;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      padding: 1.5px;
+      background: transparent;
+      overflow: hidden;
+    }
+
+    .glow-btn-wrapper:hover {
+      transform: translateY(-2px) scale(1.02);
+    }
+
+    .glow-btn-wrapper::before {
+      content: '';
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      top: -50%;
+      left: -50%;
+      background: conic-gradient(transparent 0deg 200deg, rgba(180, 180, 255, 0.2) 220deg, rgba(180, 180, 255, 0.6) 270deg, rgba(255, 255, 255, 1) 300deg, rgba(180, 180, 255, 0.6) 330deg, rgba(180, 180, 255, 0.1) 350deg, transparent 360deg);
+      animation: none;
+      will-change: transform;
+    }
+
+    .glow-btn-wrapper.glow-active::before {
+      animation: spinBorder 2.5s linear infinite;
+    }
+
+    @keyframes spinBorder {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .glow-btn-wrapper::after {
+      content: '';
+      position: absolute;
+      inset: 1.5px;
+      border-radius: 100px;
+      background: #0a0a0a;
+      z-index: 1;
+    }
+
+    .glow-btn-inner {
+      position: relative;
+      z-index: 2;
+      background: transparent;
+      border-radius: 100px;
+      padding: 14px 32px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .kw-tagbar {
+      position: relative;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      row-gap: 12px;
+      flex-wrap: wrap; /* 모바일 호환: 줄바꿈 허용 */
+      padding: 0 1rem;
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+      margin-top: 3rem;
+    }
+    @media (min-width: 768px) {
+      .kw-tagbar { flex-wrap: nowrap; row-gap: 0; } /* PC는 기존처럼 1줄 강제 */
+    }
+
+    .kw-tagbar.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .kw-tagbar-item {
+      padding: 8px 16px;
+      /* 1줄 내 배치를 위해 여백 소폭 최적화 */
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.35);
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    /* ========================================= */
+    /* [섹션 6: Contact & Footer] */
+    /* ========================================= */
+    .contact-email {
+      position: relative;
+      padding-bottom: 4px;
+    }
+
+    .contact-email::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 0;
+      height: 2px;
+      background: #b4b4ff;
+      transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: translateX(-50%);
+    }
+
+    .contact-email:hover::after {
+      width: 100%;
+    }
+
+    .link-underline {
+      position: relative;
+      padding-bottom: 2px;
+    }
+
+    .link-underline::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 0;
+      height: 1px;
+      background: #fff;
+      transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: translateX(-50%);
+    }
+
+    .link-underline:hover {
+      color: #fff;
+    }
+
+    .link-underline:hover::after {
+      width: 100%;
+    }
+
+    .icon-bounce {
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .link-underline:hover .icon-bounce {
+      transform: translate(3px, -3px);
+    }
+
+    .footer-stagger {
+      opacity: 0;
+      transform: translateY(15px);
+      transition: opacity 1.2s ease, transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .is-visible .footer-stagger-1 {
+      transition-delay: 0.5s;
+      opacity: 0.6;
+      transform: translateY(0);
+    }
+
+    .is-visible .footer-stagger-2 {
+      transition-delay: 0.7s;
+      opacity: 0.25;
+      transform: translateY(0);
+    }
+
+    .is-visible .footer-stagger-1:hover {
+      opacity: 1;
+    }
+
+    /* ========================================= */
+    /*[섹션 1: 비디오 스크롤 인터랙션 (Ref 1 스타일)] */
+    /* ========================================= */
+    #hero-section {
+      position: relative;
+      height: 100vh;
+      width: 100%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #hero-video-wrapper {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      transform-origin: center top;
+      will-change: transform, border-radius, opacity;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: #0a0a0a;
+      opacity: 0.65;
+      z-index: 1;
+      mix-blend-mode: multiply;
+    }
+
+    #hero-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+      transform: scale(1.15);
+      filter: grayscale(100%) brightness(0.3) opacity(0.5);
+      pointer-events: none;
+    }
+
+    #hero-content {
+      position: relative;
+      z-index: 10;
+      will-change: transform, opacity;
+      transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* 줌인 트랜지션 및 스크롤 잠금 */
+    body.scroll-locked {
+      overflow: hidden !important;
+    }
+
+    #hero-section.zoom-transition-active #hero-video-wrapper {
+      transform: scale(12) !important;
+      opacity: 0 !important;
+      filter: blur(15px) !important;
+      transition: transform 1.2s cubic-bezier(0.8, 0, 0.2, 1), opacity 1.2s ease-in, filter 1.2s ease !important;
+    }
+
+    #hero-section.zoom-transition-active #hero-content {
+      opacity: 0 !important;
+      transform: translateY(-40px) !important;
+    }
+    
+    /* ========================================= */
+    /* [모바일 전용 강제 숨김 처리] */
+    /* ========================================= */
+    @media (max-width: 1024px) {
+      /* 1. 프로젝트 상세(서랍장) 내부의 로고 이미지 완벽 숨김 */
+      #drawer-content img {
+        display: none !important;
+      }
+      
+      /* 2. 모바일에서 뇌 3D 애니메이션 캔버스 영역 완벽 숨김 */
+      #brain-canvas-container {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body class="scroll-locked">
+  <div class="ambient-glow"></div>
+
+  <!--[섹션 1: 인트로 (비디오 스크롤 인터랙션)] -->
+  <section id="hero-section">
+    <!-- 비디오 배경 래퍼 (스크롤 시 축소됨) -->
+    <div id="hero-video-wrapper">
+      <div class="hero-overlay"></div>
+      <!-- 임시 하이엔드 다크 비디오 소스 (veo3 교체 완료) -->
+      <video id="hero-video" autoplay loop muted playsinline>
+        <source src="./veo3(1).mp4" type="video/mp4">
+      </video>
+    </div>
+
+    <!-- 텍스트 콘텐츠 (스크롤 시 위로 페이드아웃) -->
+    <div id="hero-content" class="flex flex-col items-center w-full px-6">
+      <div
+        class="fade-up-item-init flex items-center gap-3 mb-8 opacity-0 translate-y-[10px] transition-all duration-1000 ease-out"
+        id="eyebrow">
+        <span
+          class="inline-flex items-center gap-2 text-[clamp(0.8rem,1.7vw,0.95rem)] font-medium tracking-[0.14em] uppercase text-[#f5f5f773]">
+          <span
+            class="inline-block w-1.5 h-1.5 rounded-full bg-[#b4b4ffb3] shadow-[0_0_6px_rgba(180,180,255,0.5)]"></span>
+          Strategy Lead & Product Owner
+          <span
+            class="inline-block w-1.5 h-1.5 rounded-full bg-[#b4b4ffb3] shadow-[0_0_6px_rgba(180,180,255,0.5)]"></span>
+        </span>
+      </div>
+      <h1
+        class="text-center font-semibold text-[clamp(2.8rem,7vw,6.5rem)] tracking-[-0.03em] leading-[1.08] text-[#f5f5f7] select-none flex flex-col items-center whitespace-nowrap"
+        id="headline">
+        <span><span class="word">Your&nbsp;</span><span class="word">Business</span></span>
+        <span><span class="word">Deserves&nbsp;</span><span class="word glory-word">Glory.</span></span>
+      </h1>
+      <p class="fade-up-item-init mt-7 text-center font-light text-[clamp(0.95rem,2vw,1.125rem)] leading-[1.6] text-[#f5f5f773] max-w-[480px] tracking-[0.01em] opacity-0 translate-y-[10px] transition-all duration-1000 ease-out"
+        id="subtitle">
+        · P&L ownership · product vision <br>· zero-compromise execution.<br><br><span class="text-[#f5f5f7a6]">Turning
+          strategy into measurable impact.</span>
+      </p>
+      <div class="fade-up-item-init mt-12 opacity-0 translate-y-[10px] transition-all duration-1000 ease-out"
+        id="cta-wrap">
+        <button
+          class="cta-btn inline-flex items-center gap-2.5 px-8 py-3.5 rounded-full text-[#f5f5f7] font-medium text-sm cursor-pointer"
+          onclick="triggerZoomTransition()">
+          <span>Explore Impact</span>
+          <svg class="cta-arrow" width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 3v10m0 0l-4-4m4 4l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section id="track-record"
+    class="relative z-10 w-full min-h-screen flex flex-col items-center justify-center px-6 py-24">
+    <div class="max-w-[1100px] w-full mb-12 flex justify-start fade-up-item scroll-trigger">
+      <h2 class="results-title">Results, Not Slides</h2>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-[1100px]">
+
+      <!-- 카드 1: 5.3억 (가치/돈 - 표적) -->
+      <div class="flip-container fade-up-item scroll-trigger" style="transition-delay: 0.1s;">
+        <div class="flip-inner">
+          <div class="flip-front">
+            <svg class="card-static-bg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="116" cy="85" r="65" fill="none" stroke="rgba(180,180,255,0.15)" stroke-width="1" />
+              <circle cx="116" cy="85" r="40" fill="none" stroke="rgba(180,180,255,0.25)" stroke-width="1.5" />
+              <circle cx="116" cy="85" r="15" fill="rgba(180,180,255,0.1)" />
+              <path d="M116 10 L116 160 M41 85 L191 85" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
+              <circle cx="116" cy="85" r="4" fill="#b4b4ff"
+                style="filter: drop-shadow(0 0 6px rgba(180,180,255,0.8));" />
+            </svg>
+            <div>
+              <div class="text-[clamp(3.5rem,6vw,5rem)] font-bold leading-none text-white pachinko-target mb-2" data-value="5.3&nbsp;억"></div>
+            </div>
+          </div>
+          <div class="flip-back">
+            <div class="back-title">2025 Team Revenue</div>
+            <button class="playbook-btn" onclick="openModal('modal-1')">View Playbook <svg width="14" height="14"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 카드 2: 3건 (M&A/거래 - 노드 연결) -->
+      <div class="flip-container fade-up-item scroll-trigger" style="transition-delay: 0.2s;">
+        <div class="flip-inner">
+          <div class="flip-front">
+            <svg class="card-static-bg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="75" cy="100" r="38" fill="none" stroke="rgba(180,180,255,0.1)" stroke-width="6"
+                stroke-dasharray="8 6" />
+              <circle cx="75" cy="100" r="32" fill="none" stroke="rgba(180,180,255,0.25)" stroke-width="1.5" />
+              <circle cx="75" cy="100" r="12" fill="none" stroke="rgba(180,180,255,0.15)" stroke-width="1" />
+              <circle cx="75" cy="100" r="3" fill="rgba(180,180,255,0.8)" />
+
+              <circle cx="135" cy="65" r="26" fill="none" stroke="rgba(180,180,255,0.15)" stroke-width="5"
+                stroke-dasharray="6 5" />
+              <circle cx="135" cy="65" r="21" fill="none" stroke="rgba(180,180,255,0.3)" stroke-width="1.5" />
+              <circle cx="135" cy="65" r="8" fill="none" stroke="rgba(180,180,255,0.2)" stroke-width="1" />
+              <circle cx="135" cy="65" r="3" fill="#fff" style="filter: drop-shadow(0 0 6px rgba(255,255,255,0.8));" />
+
+              <circle cx="130" cy="130" r="22" fill="none" stroke="rgba(180,180,255,0.1)" stroke-width="4"
+                stroke-dasharray="5 4" />
+              <circle cx="130" cy="130" r="18" fill="none" stroke="rgba(180,180,255,0.2)" stroke-width="1.5" />
+              <circle cx="130" cy="130" r="6" fill="none" stroke="rgba(180,180,255,0.15)" stroke-width="1" />
+              <circle cx="130" cy="130" r="2" fill="rgba(180,180,255,0.6)" />
+
+              <path d="M 75 100 L 135 65 M 75 100 L 130 130 M 135 65 L 130 130" fill="none"
+                stroke="rgba(255,255,255,0.04)" stroke-width="1" />
+            </svg>
+            <div>
+              <div
+                class="text-[clamp(3.5rem,6vw,5rem)] font-bold tracking-[-0.04em] leading-none text-white pachinko-target mb-2"
+                data-value="3&nbsp;건"></div>
+            </div>
+          </div>
+          <div class="flip-back">
+            <div class="back-title">M&A / Exit Deals</div>
+            <button class="playbook-btn" onclick="openModal('modal-2')">View Playbook <svg width="14" height="14"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 카드 3: 72만 (유튜브/미디어 - 재생 버튼) -->
+      <div class="flip-container fade-up-item scroll-trigger" style="transition-delay: 0.3s;">
+        <div class="flip-inner">
+          <div class="flip-front">
+            <svg class="card-static-bg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+              <rect x="40" y="60" width="120" height="80" rx="16" fill="none" stroke="rgba(180,180,255,0.15)"
+                stroke-width="2" />
+              <polygon points="85,80 85,120 125,100" fill="rgba(180,180,255,0.3)" />
+            </svg>
+            <div>
+              <div
+                class="text-[clamp(3.5rem,6vw,5rem)] font-bold tracking-[-0.04em] leading-none text-white pachinko-target mb-2"
+                data-value="72&nbsp;만"></div>
+            </div>
+          </div>
+          <div class="flip-back">
+            <div class="back-title">YouTube Subscribers</div>
+            <button class="playbook-btn" onclick="openModal('modal-3')">View Playbook <svg width="14" height="14"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 카드 4: 4개월 (고속성장 - 우상향 그래프) -->
+      <div class="flip-container fade-up-item scroll-trigger" style="transition-delay: 0.4s;">
+        <div class="flip-inner">
+          <div class="flip-front">
+            <svg class="card-static-bg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="growthArea" x1="0%" y1="100%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="rgba(180,180,255,0)" />
+                  <stop offset="100%" stop-color="rgba(180,180,255,0.08)" />
+                </linearGradient>
+                <filter id="neonGlow">
+                  <feGaussianBlur stdDeviation="3" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+              <rect x="50" y="140" width="16" height="40" rx="2" fill="rgba(255,255,255,0.015)" />
+              <rect x="90" y="110" width="16" height="70" rx="2" fill="rgba(255,255,255,0.02)" />
+              <rect x="130" y="70" width="16" height="110" rx="2" fill="rgba(255,255,255,0.03)" />
+
+              <path d="M 40 160 C 90 160, 120 100, 150 50 L 150 180 L 40 180 Z" fill="url(#growthArea)" />
+              <path d="M 40 160 C 90 160, 120 100, 150 50" fill="none" stroke="rgba(160,160,240,0.65)"
+                stroke-width="2.5" stroke-linecap="round" filter="url(#neonGlow)" />
+              <circle cx="150" cy="50" r="5" fill="rgba(255,255,255,0.7)" filter="url(#neonGlow)" />
+            </svg>
+            <div>
+              <div
+                class="text-[clamp(3.5rem,6vw,5rem)] font-bold tracking-[-0.04em] leading-none text-white pachinko-target mb-2"
+                data-value="4&nbsp;개월"></div>
+            </div>
+          </div>
+          <div class="flip-back">
+            <div class="back-title">Launch to Scale</div>
+            <button class="playbook-btn" onclick="openModal('modal-4')">View Playbook <svg width="14" height="14"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="capabilities"
+    class="relative z-10 w-full min-h-screen flex flex-col items-center justify-center px-6 py-32 overflow-hidden">
+    <div class="max-w-[1100px] w-full capabilities-wrapper">
+
+      <!-- 좌측: 타이틀 및 키워드 리스트 -->
+      <div class="cap-left" id="cap-left-content">
+        <div class="cap-eyebrow seq-fade">Capabilities</div>
+        <h2 class="cap-headline seq-fade glory-word">What I Do</h2>
+
+        <button class="cap-keyword-btn seq-fade -ml-6" data-index="0">
+          <div class="modal-list-title whitespace-nowrap"><span class="ml-3">New Business Strategy & Execution</span></div>
+        </button>
+        <button class="cap-keyword-btn seq-fade -ml-6" data-index="1">
+          <div class="modal-list-title whitespace-nowrap"><span class="ml-3">Brand & Commerce Growth</span></div>
+        </button>
+        <button class="cap-keyword-btn seq-fade -ml-6" data-index="2">
+          <div class="modal-list-title whitespace-nowrap"><span class="ml-3">AI Workflow & Automation</span></div>
+        </button>
+        <button class="cap-keyword-btn seq-fade -ml-6" data-index="3">
+          <div class="modal-list-title whitespace-nowrap"><span class="ml-3">Deal Sourcing & M&A</span></div>
+        </button>
+      </div>
+
+      <!-- 우측: 3D 뇌 파티클 & 글래스모피즘 패널 -->
+      <div class="cap-right">
+        <div id="brain-canvas-container" class="hidden lg:block"></div>
+
+        <div id="cap-detail-panel" class="cap-detail-panel">
+          <span class="cap-detail-num" id="panel-num">01</span>
+          <h3 class="cap-detail-title" id="panel-title">Title</h3>
+          <p class="cap-detail-desc" id="panel-desc">Description</p>
+          <div class="cap-detail-tags" id="panel-tags"></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="projects" class="w-full min-h-screen px-6 py-32">
+    <div class="max-w-[1100px] mx-auto fade-up-item scroll-trigger">
+      <div class="cap-eyebrow">Selected Work</div>
+      <h2 class="text-[clamp(3rem,6vw,5rem)] font-bold leading-none mb-16 tracking-[-0.03em]">
+        <span class="glory-word">Projects.</span>
+      </h2>
+
+      <div class="cat-item">
+        <button class="cat-header" onclick="toggleAccordion(this)">
+          <h3 class="cat-title">01. Brand & Commerce</h3>
+          <p class="cat-desc">"D2C 구축부터 수익 최적화, 브랜드 매각까지의 Full-Cycle 완수"</p>
+          <div class="cat-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <path d="M12 5v14M5 12h14" />
+            </svg></div>
+        </button>
+        <div class="cat-content">
+          <div class="cat-content-inner">
+            <div class="proj-card tilt-card" onclick="openDrawer('proj-1-1')"><span class="proj-num">01.</span>
+              <h4 class="proj-title">베이핏<br><span
+                  class="text-[1.1rem] text-[#f5f5f773] font-normal mt-2 block">D2C 브랜드 빌딩 및 자산 매각(Exit)</span></h4>
+            </div>
+            <div class="proj-card tilt-card" onclick="openDrawer('proj-1-2')"><span class="proj-num">02.</span>
+              <h4 class="proj-title">북코아<br><span
+                  class="text-[1.1rem] text-[#f5f5f773] font-normal mt-2 block">플랫폼 리빌딩 및 매출 Turnaround</span></h4>
+            </div>
+            <div class="proj-card tilt-card" onclick="openDrawer('proj-1-3')"><span class="proj-num">03.</span>
+              <h4 class="proj-title">의류 개인 사업<br><span class="text-[1.1rem] text-[#f5f5f773] font-normal mt-2 block">커머스
+                  운영 시스템 구축 및 성장</span></h4>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cat-item">
+        <button class="cat-header" onclick="toggleAccordion(this)">
+          <h3 class="cat-title">02. Media & Contents</h3>
+          <p class="cat-desc">"트래픽 자산화와 BM 다각화를 통한 미디어 비즈니스 설계"</p>
+          <div class="cat-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <path d="M12 5v14M5 12h14" />
+            </svg></div>
+        </button>
+        <div class="cat-content">
+          <div class="cat-content-inner">
+            <div class="proj-card tilt-card" onclick="openDrawer('proj-2-1')"><span class="proj-num">01.</span>
+              <h4 class="proj-title">탐구생활<br><span class="text-[1.1rem] text-[#f5f5f773] font-normal mt-2 block">운영 프로세스
+                  효율화 및 채널 매각</span></h4>
+            </div>
+            <div class="proj-card tilt-card" onclick="openDrawer('proj-2-2')"><span class="proj-num">02.</span>
+              <h4 class="proj-title">극락직업<br><span class="text-[1.1rem] text-[#f5f5f773] font-normal mt-2 block">채널 0→1
+                  구축 및 수익 모델 피보팅</span></h4>
+            </div>
+            <div class="proj-card tilt-card" onclick="openDrawer('proj-2-3')"><span class="proj-num">03.</span>
+              <h4 class="proj-title">MCN<br><span class="text-[1.1rem] text-[#f5f5f773] font-normal mt-2 block">전문직
+                  IP 기반 수익 모델 안정화</span></h4>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cat-item">
+        <button class="cat-header" onclick="toggleAccordion(this)">
+          <h3 class="cat-title">03. Corp Dev & New Business</h3>
+          <p class="cat-desc">"무형 자산 가치 평가 기반의 M&A 주도 및 신규 BM 셋업"</p>
+          <div class="cat-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <path d="M12 5v14M5 12h14" />
+            </svg></div>
+        </button>
+        <div class="cat-content">
+          <div class="cat-content-inner">
+            <div class="proj-card tilt-card" onclick="openDrawer('proj-3-1')"><span class="proj-num">01.</span>
+              <h4 class="proj-title">광고대행 사업부 신설<br><span class="text-[1.1rem] text-[#f5f5f773] font-normal mt-2 block">부문
+                  신설 및 세일즈 파이프라인 구축</span></h4>
+            </div>
+            <div class="proj-card tilt-card" onclick="openDrawer('proj-3-2')"><span class="proj-num">02.</span>
+              <h4 class="proj-title">커뮤니티 매각<br><span class="text-[1.1rem] text-[#f5f5f773] font-normal mt-2 block">무형 자산 유동화 및 독립적 딜 클로징</span></h4>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="about" class="w-full px-6 flex flex-col items-center justify-center"
+    style="min-height:100vh; overflow:hidden;">
+    <div class="kw-stage" id="kw-stage">
+      <div class="kw-center" id="kw-center"></div>
+      <div class="kw-scattered" id="kw-scattered"></div>
+    </div>
+    <div class="about-finale" id="about-finale">
+      <div class="max-w-[900px] w-full flex flex-col items-center text-center">
+        <h2 class="about-main-text" style="margin-bottom:1.5rem;">
+          <span class="about-line"
+            style="font-size:clamp(2rem,4vw,3.2rem); font-weight:700; color:#fff; letter-spacing:-0.03em; line-height:1.3; display:block; margin-bottom:0.1em;">좋은
+            전략은 실행되지 않으면 의미 없고,</span>
+          <span class="about-line glory-word"
+            style="font-size:clamp(2rem,4vw,3.2rem); font-weight:700; letter-spacing:-0.03em; line-height:1.3; display:block;">실행은
+            책임지지 않으면 완성되지 않습니다.</span>
+        </h2>
+        <p style="margin-bottom:2.5rem;">
+          <span class="about-line"
+            style="font-size:clamp(1rem,2vw,1.2rem); color:rgba(245,245,247,0.5); line-height:1.7; display:block;">직접
+            구축하고, 직접 팔고, 직접 넘겼습니다.</span>
+          <span class="about-line"
+            style="font-size:clamp(1rem,2vw,1.2rem); color:rgba(245,245,247,0.5); line-height:1.7; display:block;">커머스·콘텐츠·플랫폼,
+            업종이 달라도 방식은 같았습니다.</span>
+          <span class="about-line"
+            style="font-size:clamp(1rem,2vw,1.2rem); color:rgba(245,245,247,0.5); line-height:1.7; display:block;">운을
+            부정하지 않습니다. 다만 기회는 실행한 사람에게 온다고 생각합니다.</span>
+        </p>
+        <div class="about-line" id="glow-btn-wrap">
+          <a href="#" target="_blank" class="glow-btn-wrapper" id="glow-btn">
+            <div class="glow-btn-inner">경력기술서 <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
+                <path d="M7 17L17 7M17 7H7M17 7V17" />
+              </svg></div>
+          </a>
+        </div>
+        <div class="kw-tagbar" id="kw-tagbar">
+          <div class="kw-tagbar-item">Full-cycle 경험</div>
+          <div class="kw-tagbar-item">Operational Efficiency</div>
+          <div class="kw-tagbar-item">Deal Leverage</div>
+          <div class="kw-tagbar-item">P&L 기반 의사결정</div>
+          <div class="kw-tagbar-item">Founder Mindset</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================= -->
+  <!-- [섹션 6: Contact & Footer] -->
+  <!-- ========================================= -->
+  <section id="contact" class="relative z-10 w-full flex flex-col items-center justify-center px-6 pt-32 pb-10"
+    style="min-height: 70vh;">
+    <div
+      class="max-w-[1100px] w-full flex flex-col items-center text-center flex-1 justify-center fade-up-item scroll-trigger">
+      <div class="text-[clamp(0.8rem,1.7vw,0.95rem)] font-semibold tracking-[0.1em] text-[#b4b4ff] uppercase mb-8">Get
+        in touch</div>
+
+      <h2
+        class="text-[clamp(2.5rem,9vw,6rem)] font-bold text-white leading-[1.1] mb-10 tracking-[-0.03em] flex flex-col items-center whitespace-nowrap">
+        <span>Your Business</span>
+        <span>Deserves <span class="glory-word">Glory.</span></span>
+      </h2>
+
+      <p
+        class="text-[clamp(1.15rem,2.5vw,1.35rem)] text-[#f5f5f773] mb-16 max-w-[600px] leading-[1.6] tracking-[-0.02em]">
+        기회가 있다면, 실행은 제가 합니다.
+      </p>
+
+      <!-- 이메일 CTA (마그네틱 & Copy) -->
+      <div class="relative flex justify-center items-center w-full h-[100px]">
+        <a href="mailto:byunglory@gmail.com"
+          class="contact-email relative inline-flex justify-center items-center text-[clamp(1rem,2.5vw,2rem)] font-bold text-white tracking-tight transition-colors duration-300 hover:text-[#b4b4ff]">
+          byunglory@gmail.com
+        </a>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer
+      class="w-full max-w-[1100px] mt-32 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6 fade-up-item scroll-trigger">
+      <a href="#" target="_blank"
+        class="link-underline footer-stagger footer-stagger-1 flex items-center gap-1.5 text-[0.95rem] font-medium text-[#f5f5f773] transition-colors duration-300 tracking-[-0.01em]">
+        경력기술서
+        <svg class="icon-bounce w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+        </svg>
+      </a>
+      <div class="text-[0.85rem] font-medium text-[#f5f5f759] tracking-[-0.01em]">
+        © 2026 변영광 (Glory). All rights reserved.
+      </div>
+    </footer>
+  </section>
+
+  <!-- 모달 1 -->
+  <div id="modal-1" class="modal-overlay" onclick="closeModal(event, 'modal-1')">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <svg class="close-btn" onclick="forceClose('modal-1')" width="24" height="24" fill="none" stroke="currentColor"
+        viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+      <div class="modal-body">
+        <h3 class="modal-title">신사업전략팀 셋업 · 운영 · 리드</h3>
+        <ul class="modal-list">
+          <li>
+            <div class="modal-list-title">브랜드사업</div>
+            <div class="modal-list-desc">전자담배 액상 D2C 브랜드 구축 및 운영 총괄</div>
+          </li>
+          <li>
+            <div class="modal-list-title">콘텐츠사업</div>
+            <div class="modal-list-desc">유튜브 오리지널 콘텐츠 기획 및 MCN 비즈니스 모델 확장</div>
+          </li>
+          <li>
+            <div class="modal-list-title">Team Operations</div>
+            <div class="modal-list-desc">2명 → 5명 조직 스케일업 및 R&R 설계</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 모달 2 -->
+  <div id="modal-2" class="modal-overlay" onclick="closeModal(event, 'modal-2')">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <svg class="close-btn" onclick="forceClose('modal-2')" width="24" height="24" fill="none" stroke="currentColor"
+        viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+      <div class="modal-body">
+        <h3 class="modal-title">브랜드 양도 · 유튜브 채널 매각 · 커뮤니티 매각</h3>
+        <ul class="modal-list">
+          <li>
+            <div class="modal-list-title">네이버 커뮤니티 매각 (24.01)</div>
+            <div class="modal-list-desc">딜 구조 설계 / 계약·협상</div>
+          </li>
+          <li>
+            <div class="modal-list-title">유튜브 채널 Valuation / 매각 구조 설계 (24.10)</div>
+            <div class="modal-list-desc">채널 가치 산정 / 이해관계 조율</div>
+          </li>
+          <li>
+            <div class="modal-list-title">D2C 커머스 브랜드 매각 (24.10)</div>
+            <div class="modal-list-desc">채널 가치 산정 / 딜 구조 설계 / 계약·협상</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 모달 3 -->
+  <div id="modal-3" class="modal-overlay" onclick="closeModal(event, 'modal-3')">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <svg class="close-btn" onclick="forceClose('modal-3')" width="24" height="24" fill="none" stroke="currentColor"
+        viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+      <div class="modal-body">
+        <h3 class="modal-title">휴먼다큐 2개 채널 운영 · 총괄</h3>
+        <ul class="modal-list">
+          <li>
+            <div class="modal-list-title">유튜브 채널 <a href="https://www.youtube.com/@tamgulife" target="_blank"
+                class="modal-link">'탐구생활'</a></div>
+            <div class="modal-list-desc">운영 리빌딩 / 시스템 구축 / 수익화</div>
+          </li>
+          <li>
+            <div class="modal-list-title">유튜브 채널 <a href="https://www.youtube.com/@godjoblife" target="_blank"
+                class="modal-link">'극락직업'</a></div>
+            <div class="modal-list-desc">0 to 1 / BM Pivoting</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 모달 4 -->
+  <div id="modal-4" class="modal-overlay" onclick="closeModal(event, 'modal-4')">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <svg class="close-btn" onclick="forceClose('modal-4')" width="24" height="24" fill="none" stroke="currentColor"
+        viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+      <div class="modal-body">
+        <h3 class="modal-title">브랜드 <a href="https://vaefit.kr/" target="_blank" class="modal-link">'베이핏'</a> 런칭, 월
+          6,800만원 달성</h3>
+        <ul class="modal-list">
+          <li>
+            <div class="modal-list-title">0→1 기획·개발·세팅·런칭</div>
+            <div class="modal-list-desc">기존 자사 브랜드 이익률 저조 → 신규 고마진 브랜드(BM) 필요<br>사이드 프로젝트로 시작</div>
+          </li>
+          <li>
+            <div class="modal-list-title">결제 승인 거절, 플랫폼 제약 등 돌파</div>
+            <div class="modal-list-desc">네트워크 활용 / PG 영업 / 운영 효율화</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div id="drawer-overlay" class="drawer-overlay" onclick="closeDrawer()"></div>
+  <div id="project-drawer" class="drawer-panel">
+    <div class="drawer-header">
+      <div></div><button class="drawer-close" onclick="closeDrawer()"><svg width="24" height="24" fill="none"
+          stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg></button>
+    </div>
+    <div id="drawer-content" class="drawer-body"></div>
+  </div>
+
+  <div id="drawer-templates" style="display: none;">
+    <template id="tpl-proj-1-1">
+      <div class="drawer-logo-wrap hidden md:flex absolute right-full top-0 w-[calc(100vw-max(40vw,500px))] h-full items-center justify-center pointer-events-none z-[202]">
+         <a href="https://vaefit.kr/" target="_blank" class="pointer-events-auto transition-transform duration-700 hover:scale-110 hover:-translate-y-4">
+            <img src="./04. project_source/proj_vaefit.png" alt="Vaefit" class="max-w-[480px] w-full object-contain logo-glow-effect">
+         </a>
+      </div>
+      <a href="https://vaefit.kr/" target="_blank" class="flex md:hidden w-full mb-8 justify-center pointer-events-auto">
+         <img src="./04. project_source/proj_vaefit.png" alt="Vaefit" class="max-w-[240px] w-full object-contain logo-glow-effect">
+      </a>
+      <span class="drawer-tag">Brand & Commerce</span>
+      <h2 class="drawer-title mt-4">베이핏<br><span class="text-[1.2rem] text-[#f5f5f773] font-medium">D2C 브랜드 빌딩 및 자산 매각(Exit)</span></h2>
+      <div class="impact-box"><span class="impact-label">Business Impact</span><p class="impact-text">런칭 4개월 만에 월 매출 6,800만 원 달성 및 채용 연계형 Asset Deal 성공</p></div>
+      <div class="text-[0.8rem] text-white/50 tracking-widest uppercase mb-6">Strategic Action</div>
+      <div class="action-group"><div class="action-label">0→1 Venture Building</div><div class="action-text">브랜드 포지셔닝부터 밸류체인(제조·물류) 내재화 및 자사몰 구축 총괄</div></div>
+      <div class="action-group"><div class="action-label">Problem Solving</div><div class="action-text">규제 산업의 결제 제약(PG)을 네트워크 기반 2차 PG 계약 및 토스페이먼츠 전환으로 돌파</div></div>
+      <div class="action-group"><div class="action-label">Growth</div><div class="action-text">데이터 기반 CRM 설계로 <b>재구매율 64%</b>의 견고한 충성 고객층(Lock-in) 확보</div></div>
+      <div class="action-group"><div class="action-label">Exit</div><div class="action-text">브랜드 가치(Valuation) 산정 및 매수자(시퀀스엔) 측 이해관계 조율을 통한 딜 클로징</div></div>
+    </template>
+
+    <template id="tpl-proj-1-2">
+      <div class="drawer-logo-wrap hidden md:flex absolute right-full top-0 w-[calc(100vw-max(40vw,500px))] h-full items-center justify-center pointer-events-none z-[202]">
+         <a href="https://www.bookoa.co.kr/" target="_blank" class="pointer-events-auto transition-transform duration-700 hover:scale-110 hover:-translate-y-4">
+            <img src="./04. project_source/proj_bookoa.png" alt="Bookoa" class="max-w-[480px] w-full object-contain logo-glow-effect">
+         </a>
+      </div>
+      <a href="https://www.bookoa.co.kr/" target="_blank" class="flex md:hidden w-full mb-8 justify-center pointer-events-auto">
+         <img src="./04. project_source/proj_bookoa.png" alt="Bookoa" class="max-w-[240px] w-full object-contain logo-glow-effect">
+      </a>
+      <span class="drawer-tag">Brand & Commerce</span>
+      <h2 class="drawer-title mt-4">북코아<br><span class="text-[1.2rem] text-[#f5f5f773] font-medium">플랫폼 리빌딩 및 매출 Turnaround</span></h2>
+      <div class="impact-box"><span class="impact-label">Business Impact</span><p class="impact-text">리소스(인원/예산) 동결 상태에서 6개월 내 매출 1.2억 달성 (전년 대비 +50%)</p></div>
+      <div class="text-[0.8rem] text-white/50 tracking-widest uppercase mb-6">Strategic Action</div>
+      <div class="action-group"><div class="action-label">PO Leadership</div><div class="action-text">UX/UI 개편 및 마일리지·간편정산 시스템 도입으로 플랫폼 편의성 및 리텐션 극대화</div></div>
+      <div class="action-group"><div class="action-label">Lean Growth</div><div class="action-text">추가 마케팅 예산 없이 SEO 및 운영 효율화만으로 신규 가입자 3.7배, 공급 물량(SKU) 2.5배 증대</div></div>
+      <div class="action-group"><div class="action-label">Turnaround</div><div class="action-text">경영진의 매각 검토 단계를 성과 지표 반등을 통해 신규 투자 및 운영 유지 결정으로 전환</div></div>
+    </template>
+
+    <template id="tpl-proj-1-3">
+      <div class="drawer-logo-wrap hidden md:flex absolute right-full top-0 w-[calc(100vw-max(40vw,500px))] h-full items-center justify-center pointer-events-none z-[202]">
+         <div class="transition-transform duration-700 hover:scale-110">
+            <img src="./04. project_source/proj_gtog.png" alt="Fashion" class="max-w-[480px] w-full object-contain logo-glow-effect">
+         </div>
+      </div>
+      <div class="flex md:hidden w-full mb-8 justify-center">
+         <img src="./04. project_source/proj_gtog.png" alt="Fashion" class="max-w-[240px] w-full object-contain logo-glow-effect">
+      </div>
+      <span class="drawer-tag">Brand & Commerce</span>
+      <h2 class="drawer-title mt-4">의류 개인 사업 <br><span class="text-[1.2rem] text-[#f5f5f773] font-medium">커머스 운영 시스템 구축 및 성장</span></h2>
+      <div class="impact-box"><span class="impact-label">Business Impact</span><p class="impact-text">1인 운영 체제 하에 YoY +180% 성장, 연 매출 1억 원 달성</p></div>
+      <div class="text-[0.8rem] text-white/50 tracking-widest uppercase mb-6">Strategic Action</div>
+      <div class="action-group"><div class="action-label">End-to-End Ops</div><div class="action-text">소싱, 마케팅, CS, 물류 전 과정을 1인 시스템으로 효율화하여 고정비 최소화</div></div>
+      <div class="action-group"><div class="action-label">SEO Excellence</div><div class="action-text">플랫폼 알고리즘 분석을 통해 네이버 쇼핑 주요 키워드 상위 노출(1위) 확보</div></div>
+      <div class="action-group"><div class="action-label">Retention</div><div class="action-text">고객 생애 가치(LTV) 중심의 멤버십 제도 운영으로 지속 가능한 수익 구조 확보</div></div>
+    </template>
+
+    <template id="tpl-proj-2-1">
+      <div class="drawer-logo-wrap hidden md:flex absolute right-full top-0 w-[calc(100vw-max(40vw,500px))] h-full items-center justify-center pointer-events-none z-[202]">
+         <a href="https://www.youtube.com/@tamgulife" target="_blank" class="pointer-events-auto transition-transform duration-700 hover:scale-110 hover:-translate-y-4">
+            <img src="./04. project_source/proj_tamgulife.png" alt="Tamgulife" class="max-w-[340px] w-full object-contain logo-glow-effect">
+         </a>
+      </div>
+      <a href="https://www.youtube.com/@tamgulife" target="_blank" class="flex md:hidden w-full mb-8 justify-center pointer-events-auto">
+         <img src="./04. project_source/proj_tamgulife.png" alt="Tamgulife" class="max-w-[170px] w-full object-contain logo-glow-effect">
+      </a>
+      <span class="drawer-tag">Media & Contents</span>
+      <h2 class="drawer-title mt-4">탐구생활 <br><span class="text-[1.2rem] text-[#f5f5f773] font-medium">운영 프로세스 효율화 및 채널 매각(M&A)</span></h2>
+      <div class="impact-box"><span class="impact-label">Business Impact</span><p class="impact-text">구독자 54만 명 달성 및 3개월 만에 영업이익 4,400만 원 달성 (YoY +33%)</p></div>
+      <div class="text-[0.8rem] text-white/50 tracking-widest uppercase mb-6">Strategic Action</div>
+      <div class="action-group"><div class="action-label">Lean Operations</div><div class="action-text">고비용·저효율 인력 구조를 기술/시스템 중심의 소수 정예 체제로 재편</div></div>
+      <div class="action-group"><div class="action-label">Turnaround</div><div class="action-text">수익성 개선을 통한 채널 가치 극대화 및 채무 상계 구조를 활용한 전략적 매각 성공</div></div>
+    </template>
+
+    <template id="tpl-proj-2-2">
+      <div class="drawer-logo-wrap hidden md:flex absolute right-full top-0 w-[calc(100vw-max(40vw,500px))] h-full items-center justify-center pointer-events-none z-[202]">
+         <a href="https://www.youtube.com/@GODJOBLIFE" target="_blank" class="pointer-events-auto transition-transform duration-700 hover:scale-110 hover:-translate-y-4">
+            <img src="./04. project_source/proj_godjoblife.png" alt="Godjoblife" class="max-w-[480px] w-full object-contain logo-glow-effect">
+         </a>
+      </div>
+      <a href="https://www.youtube.com/@GODJOBLIFE" target="_blank" class="flex md:hidden w-full mb-8 justify-center pointer-events-auto">
+         <img src="./04. project_source/proj_godjoblife.png" alt="Godjoblife" class="max-w-[240px] w-full object-contain logo-glow-effect">
+      </a>
+      <span class="drawer-tag">Media & Contents</span>
+      <h2 class="drawer-title mt-4">극락직업 <br><span class="text-[1.2rem] text-[#f5f5f773] font-medium">유튜브 채널 0→1 구축 및 수익 모델 피보팅</span></h2>
+      <div class="impact-box"><span class="impact-label">Business Impact</span><p class="impact-text">구독자 18.4만 명 달성 및 제작 위탁(MCN) 기반 고수익 BM 안착</p></div>
+      <div class="text-[0.8rem] text-white/50 tracking-widest uppercase mb-6">Strategic Action</div>
+      <div class="action-group"><div class="action-label">Systematization</div><div class="action-text">제작 시스템 및 업로드 파이프라인 0→1 구축으로 콘텐츠 생산 가속화</div></div>
+      <div class="action-group"><div class="action-label">BM Pivoting</div><div class="action-text">단순 조회수 광고 수익의 한계를 진단, 전문직 대상 MCN 제작 위탁 모델로 사업 구조 전환</div></div>
+      <div class="action-group"><div class="action-label">AI Workflow</div><div class="action-text">AI 자동화 툴을 활용해 운영 리드타임을 단축, 주 1회 고퀄리티 업로드 체계 정착</div></div>
+    </template>
+
+    <template id="tpl-proj-2-3">
+      <div class="drawer-logo-wrap hidden md:flex absolute right-full top-0 w-[calc(100vw-max(40vw,500px))] h-full items-center justify-center pointer-events-none z-[202]">
+         <a href="https://www.youtube.com/@김형규변호사" target="_blank" class="pointer-events-auto transition-transform duration-700 hover:scale-110 hover:-translate-y-4">
+            <img src="./04. project_source/proj_mcn.png" alt="Lawyer" class="max-w-[840px] w-full object-contain logo-glow-effect">
+         </a>
+      </div>
+      <a href="https://www.youtube.com/@김형규변호사" target="_blank" class="flex md:hidden w-full mb-8 justify-center pointer-events-auto">
+         <img src="./04. project_source/proj_mcn.png" alt="Lawyer" class="max-w-[430px] w-full object-contain logo-glow-effect">
+      </a>
+      <span class="drawer-tag">Media & Contents</span>
+      <h2 class="drawer-title mt-4">김형규 변호사<br><span class="text-[1.2rem] text-[#f5f5f773] font-medium">전문직 IP 기반 수익 모델 안정화</span></h2>
+      <div class="impact-box"><span class="impact-label">Business Impact</span><p class="impact-text">월 고정 매출(MRR) 550만 원 확보 및 턴키 운영 시스템 구축</p></div>
+      <div class="text-[0.8rem] text-white/50 tracking-widest uppercase mb-6">Strategic Action</div>
+      <div class="action-group"><div class="action-label">Deal Sourcing</div><div class="action-text">전문직 채널 타겟 리스트업 및 아웃바운드 영업으로 계약 체결</div></div>
+      <div class="action-group"><div class="action-label">Turn-key Sales</div><div class="action-text">제안부터 계약, 제작, 정산까지의 전 과정을 표준화하여 운영 리소스 최적화</div></div>
+    </template>
+
+    <template id="tpl-proj-3-1">
+      <span class="drawer-tag">Corp Dev & New Business</span>
+      <h2 class="drawer-title mt-4">광고대행 사업부 신설<br><span class="text-[1.2rem] text-[#f5f5f773] font-medium">부문 신설 및 세일즈 파이프라인 구축</span></h2>
+      <div class="impact-box"><span class="impact-label">Business Impact</span><p class="impact-text">신규 사업부 0->1 셋업, 계약 6건 체결 및 월 280만 원의 신규 수익 창출 달성</p></div>
+      <div class="text-[0.8rem] text-white/50 tracking-widest uppercase mb-6">Strategic Action</div>
+      <div class="action-group"><div class="action-label">Infrastructure</div><div class="action-text">정산 플로우 및 파트너십 구조 0→1 세팅으로 대행 사업 기틀 마련</div></div>
+      <div class="action-group"><div class="action-label">Sales Pipeline</div><div class="action-text">제안서/미디어믹스 표준화를 통해 신규 광고 계약 6건 체결</div></div>
+      <div class="action-group"><div class="action-label">Enablement</div><div class="action-text">사내 직무 교육 커리큘럼 설계를 통한 조직 역량 상향 평준화 주도</div></div>
+    </template>
+
+    <template id="tpl-proj-3-2">
+      <span class="drawer-tag">Corp Dev & New Business</span>
+      <h2 class="drawer-title mt-4">커뮤니티 매각 (Asset Deal) <br><span class="text-[1.2rem] text-[#f5f5f773] font-medium">무형 자산 유동화 및 독립적 딜 클로징 전략 수립</span></h2>
+      <div class="impact-box"><span class="impact-label">Business Impact</span><p class="impact-text">회사 내 유휴 자산을 단기간에 현금 자산으로 유동화하여 기업 재무 리스크 해소</p></div>
+      <div class="text-[0.8rem] text-white/50 tracking-widest uppercase mb-6">Strategic Action</div>
+      <div class="action-group"><div class="action-label">Deal Sourcing & Matching</div><div class="action-text">경영진의 긴급 요청에 대응하여, 개인 인적 네트워크 내 잠재 매수자를 직접 소싱하여 딜 테이블 마련</div></div>
+      <div class="action-group"><div class="action-label">Independent Valuation</div><div class="action-text">유휴 자산의 시장 가치를 분석하고 매수자·매도자(경영진) 간 이해관계를 조율하여 최종 가액 합의 도출</div></div>
+      <div class="action-group"><div class="action-label">End-to-End Execution</div><div class="action-text">NDA(비밀유지계약) 체결, 본계약서 작성, 실무 권한 위임 및 인수인계 등 매각 전 과정을 주도적으로 완수</div></div>
+    </template>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // 히어로 비디오 5초 구간 반복 로직
+      const heroVid = document.getElementById('hero-video');
+      if (heroVid) {
+        heroVid.addEventListener('timeupdate', () => {
+          if (heroVid.currentTime >= 5) {
+            heroVid.currentTime = 0;
+            heroVid.play();
+          }
+        });
+      }
+      const words = document.querySelectorAll(".word");
+      const eyebrow = document.getElementById("eyebrow");
+      const subtitle = document.getElementById("subtitle");
+      const ctaWrap = document.getElementById("cta-wrap");
+
+      setTimeout(() => { if (eyebrow) { eyebrow.classList.remove("opacity-0", "translate-y-[10px]"); eyebrow.classList.add("opacity-100", "translate-y-0"); } }, 300);
+
+      words.forEach((word, i) => {
+        setTimeout(() => {
+          word.classList.add("active");
+          if (i === words.length - 1) {
+            setTimeout(() => { if (subtitle) { subtitle.classList.remove("opacity-0", "translate-y-[10px]"); subtitle.classList.add("opacity-100", "translate-y-0"); } }, 600);
+            setTimeout(() => { if (ctaWrap) { ctaWrap.classList.remove("opacity-0", "translate-y-[10px]"); ctaWrap.classList.add("opacity-100", "translate-y-0"); } }, 1500);
+          }
+        }, i * 800 + 400);
+      });
+
+      const fadeObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('is-visible'); } });
+      }, { threshold: 0.15 });
+      document.querySelectorAll('.scroll-trigger').forEach(el => fadeObserver.observe(el));
+
+      function triggerPachinko(element) {
+        const finalValue = element.getAttribute('data-value');
+        element.innerHTML = '';
+        [...finalValue].forEach((char, idx) => {
+          const wrapper = document.createElement('span');
+          wrapper.className = 'slot-wrapper';
+          
+          // 숫자(0-9) 또는 소수점(.)일 경우에만 자간을 좁히는 클래스 추가
+          if (/[0-9.]/.test(char)) {
+            wrapper.classList.add('tight-spacing');
+          }
+
+          if (/[0-9]/.test(char)) {
+            const column = document.createElement('span');
+            column.className = 'slot-column';
+            let html = '';
+            for (let j = 0; j < 10; j++) { html += `<span class="slot-char">${Math.floor(Math.random() * 10)}</span>`; }
+            html += `<span class="slot-char">${char}</span>`;
+            column.innerHTML = html;
+            wrapper.appendChild(column);
+            element.appendChild(wrapper);
+            setTimeout(() => { column.style.transform = `translateY(-10em)`; }, 100 + (idx * 150));
+          } else {
+            wrapper.innerHTML = `<span class="slot-char">${char}</span>`;
+            wrapper.style.opacity = '0';
+            wrapper.style.transition = 'opacity 1s ease';
+            element.appendChild(wrapper);
+            setTimeout(() => { wrapper.style.opacity = '1'; }, 1000 + (idx * 100));
+          }
+        });
+      }
+
+      const pachinkoObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => { if (entry.isIntersecting && !entry.target.dataset.rolled) { entry.target.dataset.rolled = 'true'; triggerPachinko(entry.target); } });
+      }, { threshold: 0.3 });
+      document.querySelectorAll('.pachinko-target').forEach(el => pachinkoObserver.observe(el));
+    });
+
+    function openModal(id) { document.getElementById(id).classList.add('active'); document.body.style.overflow = 'hidden'; }
+    function closeModal(event, id) { if (event.target.id === id) forceClose(id); }
+    function forceClose(id) { document.getElementById(id).classList.remove('active'); document.body.style.overflow = 'auto'; }
+
+    function toggleAccordion(element) {
+      const item = element.parentElement;
+      const content = element.nextElementSibling;
+      const isActive = item.classList.contains('active');
+      document.querySelectorAll('.cat-item').forEach(el => { el.classList.remove('active'); el.querySelector('.cat-content').style.maxHeight = null; });
+      if (!isActive) { item.classList.add('active'); content.style.maxHeight = content.scrollHeight + "px"; setTimeout(() => initTiltCards(), 100); }
+    }
+
+    function initTiltCards() {
+      const cards = document.querySelectorAll('.tilt-card');
+      cards.forEach(card => {
+        card.addEventListener('mousemove', e => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          card.style.setProperty('--mouse-x', `${x}px`);
+          card.style.setProperty('--mouse-y', `${y}px`);
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+          const rotateX = ((y - centerY) / centerY) * -10;
+          const rotateY = ((x - centerX) / centerX) * 10;
+          card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+        });
+        card.addEventListener('mouseleave', () => { card.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)`; });
+      });
+    }
+
+    function openDrawer(projectId) {
+      const overlay = document.getElementById('drawer-overlay');
+      const drawer = document.getElementById('project-drawer');
+      const contentArea = document.getElementById('drawer-content');
+      const template = document.getElementById('tpl-' + projectId);
+
+      if (template) {
+        // DOM 복제(cloneNode) 환경 변수를 타지 않도록, 가장 원초적인 텍스트 기반 HTML 렌더링으로 강제 주입
+        contentArea.innerHTML = template.innerHTML;
+
+        overlay.classList.add('active');
+        drawer.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeDrawer() {
+      document.getElementById('drawer-overlay').classList.remove('active');
+      document.getElementById('project-drawer').classList.remove('active');
+      document.body.style.overflow = 'auto';
+      setTimeout(() => { document.getElementById('drawer-content').innerHTML = ''; }, 500);
+    }
+
+    const aboutObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if (entry.isIntersecting) { entry.target.querySelectorAll('.about-word').forEach((w, i) => { setTimeout(() => w.classList.add('active'), i * 100); }); aboutObserver.unobserve(entry.target); } });
+    }, { threshold: 0.1 });
+    const aboutSection = document.getElementById('about-finale');
+    if (aboutSection) aboutObserver.observe(aboutSection);
+
+    const KW_DATA = ['Full-cycle 경험', 'Operational Efficiency', 'Deal Leverage', 'P&L 기반 의사결정', 'Founder Mindset'];
+    const KW_POSITIONS = [
+      { top: '22%', left: '18%', fontSize: '1.6rem' },
+      { top: '18%', right: '20%', fontSize: '1.1rem' },
+      { top: '48%', left: '14%', fontSize: '1.3rem' },
+      { bottom: '24%', right: '18%', fontSize: '1.5rem' },
+      { bottom: '20%', left: '28%', fontSize: '1rem' }
+    ];
+
+    function runKwStage() {
+      const stage = document.getElementById('kw-stage');
+      const center = document.getElementById('kw-center');
+      const scattered = document.getElementById('kw-scattered');
+      const finale = document.getElementById('about-finale');
+      if (!stage || !center) return;
+
+      const tags = [];
+      KW_DATA.forEach((kw, i) => {
+        const el = document.createElement('div');
+        el.className = 'kw-tag';
+        el.textContent = kw;
+        el.style.fontSize = KW_POSITIONS[i].fontSize;
+        const pos = { ...KW_POSITIONS[i] };
+        delete pos.fontSize;
+        Object.assign(el.style, pos);
+        scattered.appendChild(el);
+        tags.push(el);
+      });
+
+      let step = 0;
+      function next() {
+        if (step >= KW_DATA.length) {
+          setTimeout(() => {
+            // 키워드 전부 사라짐
+            tags.forEach(t => { t.style.opacity = '0'; t.style.transition = 'opacity 0.6s ease'; });
+            setTimeout(() => {
+              // kw-stage 숨기고 같은 자리에 finale 표시
+              stage.style.display = 'none';
+              finale.classList.add('visible');
+              // 라인별 순차 페이드인 (10% 빠르게)
+              const lines = finale.querySelectorAll('.about-line');
+              lines.forEach((line, i) => {
+                setTimeout(() => line.classList.add('active'), i * 1125);
+              });
+              // 경력기술서 버튼 글로시 (10% 빠르게)
+              const btnLine = document.getElementById('glow-btn-wrap');
+              const btnLineIdx = Array.from(lines).indexOf(btnLine);
+              setTimeout(() => {
+                document.getElementById('glow-btn').classList.add('glow-active');
+              }, btnLineIdx * 1125 + 900);
+              // 태그바 (10% 빠르게)
+              setTimeout(() => {
+                document.getElementById('kw-tagbar').classList.add('visible');
+              }, btnLineIdx * 1125 + 1980);
+            }, 350); // 전환 장면 50% 빠르게
+          }, 300); // 전환 장면 50% 빠르게
+          return;
+        }
+        center.textContent = KW_DATA[step];
+        center.classList.add('visible');
+        setTimeout(() => {
+          center.classList.remove('visible');
+          setTimeout(() => {
+            tags[step].classList.add('placed');
+            step++;
+            setTimeout(next, 400); // 키워드 등장 20% 빠르게
+          }, 240); // 키워드 등장 20% 빠르게
+        }, 880); // 키워드 등장 20% 빠르게
+      }
+      setTimeout(next, 400);
+    }
+
+    const stageObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !entry.target.dataset.played) {
+          entry.target.dataset.played = 'true';
+          runKwStage();
+          stageObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+    const kwStage = document.getElementById('kw-stage');
+    if (kwStage) stageObserver.observe(kwStage);
+
+    const bentoCardsList = document.querySelectorAll('.track-mouse');
+    bentoCardsList.forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+        card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+      });
+    });
+
+    // [섹션 1: 줌인 트랜지션 효과]
+    function triggerZoomTransition() {
+      const heroSection = document.getElementById('hero-section');
+      if (heroSection) heroSection.classList.add('zoom-transition-active');
+
+      setTimeout(() => {
+        document.body.classList.remove('scroll-locked'); // 스크롤 잠금 해제
+        document.getElementById('track-record').scrollIntoView({ behavior: 'auto' }); // 즉시 다음 섹션으로 화면 전환
+      }, 900); // 줌인 타이밍 정점에 맞춰 컷 전환
+    }
+
+    //[섹션 1: Ref 1 스타일 스크롤 연동 애니메이션]
+    const heroWrapper = document.getElementById('hero-video-wrapper');
+    const heroContent = document.getElementById('hero-content');
+    const heroSection = document.getElementById('hero-section');
+    let ticking = false;
+
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrollY = window.scrollY;
+
+          // 맨 위로 다시 스크롤하면 인트로 리셋 및 재잠금 (One-way 트랜지션 복구)
+          if (scrollY <= 10 && heroSection && heroSection.classList.contains('zoom-transition-active')) {
+            heroSection.classList.remove('zoom-transition-active');
+            document.body.classList.add('scroll-locked');
+          }
+
+          const maxScroll = window.innerHeight;
+          let progress = Math.min(scrollY / maxScroll, 1);
+
+          // 줌인 애니메이션 중이 아닐 때만 기존 스크롤 효과 적용
+          if (heroWrapper && heroContent && (!heroSection || !heroSection.classList.contains('zoom-transition-active'))) {
+            const scale = 1 - (progress * 0.15);
+            const borderRadius = progress * 40;
+            const opacity = 1 - (progress * 0.5);
+
+            heroWrapper.style.transform = `scale(${scale}) translateY(${scrollY * 0.4}px)`;
+            heroWrapper.style.borderRadius = `${borderRadius}px`;
+            heroWrapper.style.opacity = opacity;
+
+            heroContent.style.transform = `translateY(${scrollY * 0.6}px)`;
+            heroContent.style.opacity = 1 - (progress * 1.5);
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
+    });
+
+    /* ========================================= */
+    /*[섹션 3: 3D Brain 파티클 및 인터랙션 로직] */
+    /* ========================================= */
+    const capData = [
+      { num: "01", title: "New Business Strategy & Execution", desc: "신규 사업 기회 발굴부터 BM 설계, P&L 관리, 조직 셋업까지<br>End-to-End 실행.", tags: ["0→1", "P&L", "GTM", "Exit"] },
+      { num: "02", title: "Brand & Commerce Growth", desc: "D2C 브랜드 런칭·운영, 퍼포먼스 마케팅, CRM. 실제 매출 데이터 기반의 그로스 전략 실행.", tags: ["Branding", "D2C", "Performance", "Retention"] },
+      { num: "03", title: "AI Workflow & Automation", desc: "멀티 AI 에이전트 설계, 업무 자동화, AI 내재화. 개발자 없이 웹 프로토타이핑·배포 직접 실행.", tags: ["Orchestration", "Agents", "Automation", "Prototyping"] },
+      { num: "04", title: "Deal Sourcing & M&A", desc: "매각·투자·제휴 딜 구조 설계, Valuation, 협상 조율. 총 3건의 딜 클로징 실전 경험.", tags: ["Valuation", "Negotiation", "Asset Deal", "NDA"] }
+    ];
+
+    function initBrainEffect() {
+      const container = document.getElementById('brain-canvas-container');
+      if (!container || typeof THREE === 'undefined') return;
+
+      // 1. Three.js 기본 셋업
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+      camera.position.z = 12;
+
+      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(renderer.domElement);
+
+      // 2. 파티클(뇌 형태) 생성
+      const particleCount = 4600;
+      const geometry = new THREE.BufferGeometry();
+      const positions = new Float32Array(particleCount * 3);
+      const targetPositions = new Float32Array(particleCount * 3);
+      const colors = new Float32Array(particleCount * 3);
+      const sizes = new Float32Array(particleCount);
+
+      for (let i = 0; i < particleCount; i++) {
+        // 초기 위치 (랜덤하게 흩어진 상태)
+        positions[i * 3] = (Math.random() - 0.5) * 40;
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 40;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 40;
+
+        // 목표 위치 (뇌 형태 근사치 계산)
+        let r = 3.5 + Math.random() * 1.7;
+        let theta = Math.random() * Math.PI * 2;
+        let phi = Math.acos(2 * Math.random() - 1);
+
+        let x = r * Math.sin(phi) * Math.cos(theta);
+        let y = r * Math.sin(phi) * Math.sin(theta);
+        let z = r * Math.cos(phi);
+
+        // 뇌의 타원형 및 좌우 반구 형태 조정
+        x *= 0.75;
+        z *= 1.1;
+        y *= 0.85;
+
+        // 중심부 틈새 먼저 처리
+        if (Math.abs(x) < 0.3) { x += (x > 0 ? 0.4 : -0.4); }
+
+        // 주름 노이즈
+        const wrinkle = Math.sin(theta * 7) * Math.cos(phi * 5) * 0.4;
+        const wx = x + wrinkle * Math.sin(phi);
+        const wy = y + wrinkle * Math.cos(phi) * 0.6;
+        const wz = z + wrinkle * 0.3;
+
+        targetPositions[i * 3] = wx;
+        targetPositions[i * 3 + 1] = wy;
+        targetPositions[i * 3 + 2] = wz;
+
+        // ✅ colorMix 먼저 선언
+        let colorMix = Math.random();
+        const depth = (wz + 5) / 10;
+
+        if (colorMix > 0.95) {
+          colors[i * 3] = 0.7; colors[i * 3 + 1] = 0.7; colors[i * 3 + 2] = 1.0;
+        } else if (depth > 0.6) {
+          const s = 0.6 + depth * 0.4;
+          colors[i * 3] = s * 0.85; colors[i * 3 + 1] = s * 0.85; colors[i * 3 + 2] = s;
+        } else {
+          colors[i * 3] = 0.15 + depth * 0.2;
+          colors[i * 3 + 1] = 0.1 + depth * 0.15;
+          colors[i * 3 + 2] = 0.25 + depth * 0.3;
+        }
+
+        sizes[i] = Math.random() * 2.0 + 0.5;
+      }
+
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+      geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+      // 커스텀 쉐이더 매테리얼 (사이즈, 컬러, 스파크 적용)
+      const material = new THREE.ShaderMaterial({
+        uniforms: {
+          time: { value: 0 },
+          pulse: { value: 1.0 }
+        },
+        vertexShader: `
+          uniform float time;
+          uniform float pulse;
+          attribute float size;
+          attribute vec3 color;
+          varying vec3 vColor;
+          void main() {
+            vColor = color;
+            // 스파크 효과 (특정 파티클이 간헐적으로 커짐)
+            float spark = sin(time * 5.0 + position.x * 10.0) * 0.5 + 0.5;
+            float finalSize = size * pulse * (1.0 + spark * 0.5);
+            vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+            gl_PointSize = finalSize * (15.0 / -mvPosition.z);
+            gl_Position = projectionMatrix * mvPosition;
+          }
+        `,
+        fragmentShader: `
+          varying vec3 vColor;
+          void main() {
+            // 원형 파티클 렌더링
+            float dist = length(gl_PointCoord - vec2(0.5));
+            if (dist > 0.5) discard;
+            gl_FragColor = vec4(vColor, 0.8 - dist);
+          }
+        `,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending
+      });
+
+      const particleSystem = new THREE.Points(geometry, material);
+      scene.add(particleSystem);
+
+      // 3. 애니메이션 루프 (심장박동 Pulse & 회전)
+      const clock = new THREE.Clock();
+      let isGathered = false;
+
+      function animate() {
+        requestAnimationFrame(animate);
+        const elapsedTime = clock.getElapsedTime();
+
+        // 심장박동(Pulse) 효과: 미세하게 수축/팽창
+        const pulse = 1.0 + Math.sin(elapsedTime * Math.PI * 1.2) * 0.2;
+        material.uniforms.pulse.value = pulse;
+        material.uniforms.time.value = elapsedTime;
+
+        // 뇌 전체의 미세한 유영(회전)
+        particleSystem.rotation.y = Math.sin(elapsedTime * 0.1) * 0.15;
+        particleSystem.rotation.x = Math.cos(elapsedTime * 0.4) * 0.08;
+
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      // 4. 스크롤 트리거: 섹션 진입 시 파티클 모이기 & 좌측 텍스트 순차 노출
+      gsap.registerPlugin(ScrollTrigger);
+
+      ScrollTrigger.create({
+        trigger: "#capabilities",
+        start: "top 60%",
+        onEnter: () => {
+          if (isGathered) return;
+          isGathered = true;
+
+          // 파티클 모이는 애니메이션
+          const posAttribute = geometry.attributes.position;
+          gsap.to(posAttribute.array, {
+            endArray: targetPositions,
+            duration: 2.5,
+            ease: "power3.inOut",
+            onUpdate: () => { posAttribute.needsUpdate = true; }
+          });
+
+          // 좌측 텍스트 순차 노출
+          gsap.to(".seq-fade", {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            stagger: 0.15,
+            ease: "power3.out"
+          });
+        }
+      });
+
+      // 리사이즈 대응
+      window.addEventListener('resize', () => {
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+      });
+    }
+
+    // 5. 키워드 호버 시 글래스 패널 노출 및 아웃 시 숨김
+    function initCapInteractions() {
+      const btns = document.querySelectorAll('.cap-keyword-btn');
+      const panel = document.getElementById('cap-detail-panel');
+      const pNum = document.getElementById('panel-num');
+      const pTitle = document.getElementById('panel-title');
+      const pDesc = document.getElementById('panel-desc');
+      const pTags = document.getElementById('panel-tags');
+
+      btns.forEach(btn => {
+        // 마우스 진입 시 패널 노출
+        btn.addEventListener('mouseenter', () => {
+          btns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          const idx = btn.getAttribute('data-index');
+          const data = capData[idx];
+
+          pNum.textContent = data.num;
+          pTitle.textContent = data.title;
+          pDesc.innerHTML = data.desc;
+          pTags.innerHTML = data.tags.map(tag => `<span class="cap-detail-tag">${tag}</span>`).join('');
+
+          panel.classList.remove('active');
+          setTimeout(() => { panel.classList.add('active'); }, 10);
+        });
+
+        // 마우스가 버튼을 벗어나면 즉시 확대 해제 및 패널 숨김
+        btn.addEventListener('mouseleave', () => {
+          btn.classList.remove('active');
+          panel.classList.remove('active');
+        });
+      });
+    }
+
+    // 실행 (DOM 로드 후 약간의 딜레이를 주어 안정성 확보)
+    setTimeout(() => {
+      initBrainEffect();
+      initCapInteractions();
+    }, 500);
+
+
+  </script>
