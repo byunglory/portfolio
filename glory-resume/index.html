@@ -1049,6 +1049,24 @@ details[open] > summary .dd-arrow { transform: rotate(180deg); }
   .edu-card { break-inside: avoid; }
 }
 </style>
+<script>
+  // 우클릭 방지
+  document.oncontextmenu = function(e){ return false; }
+  // 드래그 및 텍스트 선택 방지
+  document.onselectstart = function(e){ return false; }
+  
+  document.onkeydown = function(e) {
+    // F12(개발자 도구), Ctrl+Shift+I, Ctrl+U(소스보기), Ctrl+C(복사) 및 Mac(Cmd) 호환 방지
+    if (
+      e.keyCode === 123 || 
+      (e.ctrlKey && e.shiftKey && e.keyCode === 73) || 
+      ((e.ctrlKey || e.metaKey) && e.keyCode === 85) || 
+      ((e.ctrlKey || e.metaKey) && e.keyCode === 67)
+    ) {
+      return false;
+    }
+  }
+</script>
 </head>
 <body>
 
